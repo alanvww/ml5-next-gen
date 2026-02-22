@@ -1,0 +1,15 @@
+diff --git a/node_modules/@tensorflow-models/body-segmentation/dist/shared/calculators/tensors_to_segmentation.js b/node_modules/@tensorflow-models/body-segmentation/dist/shared/calculators/tensors_to_segmentation.js
+index ab73dfc..0d8015e 100644
+--- a/node_modules/@tensorflow-models/body-segmentation/dist/shared/calculators/tensors_to_segmentation.js
++++ b/node_modules/@tensorflow-models/body-segmentation/dist/shared/calculators/tensors_to_segmentation.js
+@@ -50,8 +50,8 @@ function tensorsToSegmentation(segmentationTensor, config, outputSize) {
+                     throw new Error("Activation not supported (" + config.activation + ")");
+             }
+             var outputMat = outputSize ?
+-                tf.image.resizeBilinear(smallMaskMat, [outputSize.height, outputSize.width]) :
+-                smallMaskMat;
++                tf.image.resizeBilinear(smallMaskMat, [outputSize.height, outputSize.width]).clipByValue(0, 1) :
++                smallMaskMat.clipByValue(0, 1);
+             // Remove channel dimension.
+             return tf.squeeze(outputMat, [2]);
+         }

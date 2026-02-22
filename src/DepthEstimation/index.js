@@ -292,7 +292,7 @@ class DepthEstimation {
        */
       resizedSource = resizeImageAsTensor(image, image.width, image.height);
       normalizedSource = tf.tidy(() => {
-        return resizedSource.div(255.0);
+        return resizedSource.div(255.0).clipByValue(0, 1);
       });
       inputForDepth = resizedSource;
     }
@@ -476,7 +476,9 @@ class DepthEstimation {
       );
 
       // Create a p5.Image from the exact frame used for the estimation being returned in this result
-      result.sourceFrame = this.generateP5Image(this.getSourceFrameCanvas(width, height));
+      result.sourceFrame = this.generateP5Image(
+        this.getSourceFrameCanvas(width, height)
+      );
 
       // --- Apply Black Background using Segmentation Mask (if enabled) ---
       if (currentRuntimeConfig.applySegmentationMask && binaryMask) {
@@ -644,7 +646,7 @@ class DepthEstimation {
           this.detectMedia.height
         );
         normalizedSource = tf.tidy(() => {
-          return resizedSource.div(255.0);
+          return resizedSource.div(255.0).clipByValue(0, 1);
         });
         inputForDepth = resizedSource;
       }
