@@ -170,6 +170,7 @@ class FaceMesh {
     );
     const { image, callback } = argumentObject;
     // Run the prediction
+    await this.ready;
     await mediaReady(image, false);
     const predictions = await this.model.estimateFaces(
       image,
@@ -230,6 +231,7 @@ class FaceMesh {
    * @private
    */
   async detectLoop() {
+    await this.ready;
     await mediaReady(this.detectMedia, false);
     while (!this.signalStop) {
       const predictions = await this.model.estimateFaces(

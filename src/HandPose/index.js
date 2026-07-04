@@ -179,6 +179,7 @@ class HandPose {
     );
     const { image, callback } = argumentObject;
     // Run the detection
+    await this.ready;
     await mediaReady(image, false);
     const predictions = await this.model.estimateHands(
       image,
@@ -242,6 +243,7 @@ class HandPose {
    * @private
    */
   async detectLoop() {
+    await this.ready;
     await mediaReady(this.detectMedia, false);
     while (!this.signalStop) {
       const predictions = await this.model.estimateHands(
