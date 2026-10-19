@@ -41,6 +41,8 @@ Jump right into experimenting with ml5.js — no local setup needed. Browse and 
 * [imageClassifier-single-image](https://editor.p5js.org/ml5/sketches/pjPr6XmPY)
 * [imageClassifier-teachable-machine](https://editor.p5js.org/ml5/sketches/VvGXajA36)
 * [imageClassifier-webcam](https://editor.p5js.org/ml5/sketches/K0sjaEO19)
+* languageModel-chat-stream *(not uploaded yet)*
+* languageModel-text-generation *(not uploaded yet)*
 * [neuralNetwork-color-classifier](https://editor.p5js.org/ml5/sketches/eGHBdmCLe)
 * [neuralNetwork-load-model](https://editor.p5js.org/ml5/sketches/U-aljtx7x)
 * [neuralNetwork-mouse-gesture](https://editor.p5js.org/ml5/sketches/FdXAgrA3N)

@@ -11,6 +11,7 @@ import setBackend from "./utils/setBackend";
 import configureBackend from "./utils/configureBackend";
 import bodySegmentation from "./BodySegmentation";
 import depthEstimation from "./DepthEstimation";
+import languageModel from "./LanguageModel";
 import communityStatement from "./utils/communityStatement";
 import * as tf from "@tensorflow/tfjs";
 import * as tfvis from "@tensorflow/tfjs-vis";
@@ -25,6 +26,8 @@ const withPreload = {
   featureExtractor,
   handPose,
   imageClassifier,
+  languageModel,
+  llm: languageModel,
   neuralNetwork,
   sentiment,
   soundClassifier,

@@ -1,4 +1,3 @@
-import '@tensorflow/tfjs-node'; // loads the tensorflow/node backend to the registry
 import crossFetch from 'cross-fetch';
 import * as tf from '@tensorflow/tfjs';
 
@@ -6,7 +5,7 @@ async function setupTests() {
 
   console.log("Beginning setup");
 
-  await tf.setBackend('tensorflow');
+  await tf.setBackend('cpu');
   tf.env().set('IS_BROWSER', false);
   tf.env().set('IS_NODE', true);
 

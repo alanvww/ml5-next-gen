@@ -46,7 +46,9 @@ export const isAudio = (img) => {
  */
 export const isCanvas = (img) => {
   return (
-    typeof HTMLCanvasElement !== "undefined" && (img instanceof HTMLCanvasElement || img instanceof OffscreenCanvas)
+    (typeof HTMLCanvasElement !== "undefined" &&
+      img instanceof HTMLCanvasElement) ||
+    (typeof OffscreenCanvas !== "undefined" && img instanceof OffscreenCanvas)
   );
 };
 

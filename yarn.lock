@@ -1916,6 +1916,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@litert-lm/core@npm:0.19.0-nightly.20261018":
+  version: 0.19.0-nightly.20261018
+  resolution: "@litert-lm/core@npm:0.19.0-nightly.20261018"
+  dependencies:
+    "@litertjs/wasm-utils": "npm:^2.0.0"
+  checksum: 10c0/9cc470250e798fadfd2246c40abd421165d078e02dc23349b8e82e9215f1de643d553e632a3505e1c1e1611c8cd3ca99820391a14d35bb7a9bf998915ebc5caa
+  languageName: node
+  linkType: hard
+
+"@litertjs/wasm-utils@npm:^2.0.0":
+  version: 2.5.3
+  resolution: "@litertjs/wasm-utils@npm:2.5.3"
+  checksum: 10c0/7dff6d4f786a1de126fca65bc09de17da3dd3c6c9e7cf72a00f1aa7e93dfb3be78bcab7edb709c124c9ca36dad60870f8256b62d82104b9fa879764992c8796d
+  languageName: node
+  linkType: hard
+
 "@mediapipe/face_mesh@npm:^0.4.1633559619":
   version: 0.4.1633559619
   resolution: "@mediapipe/face_mesh@npm:0.4.1633559619"
@@ -7004,6 +7020,7 @@ __metadata:
     "@babel/core": "npm:^7.23.2"
     "@babel/preset-env": "npm:^7.23.2"
     "@huggingface/transformers": "npm:^4.3.0"
+    "@litert-lm/core": "npm:0.19.0-nightly.20261018"
     "@mediapipe/face_mesh": "npm:^0.4.1633559619"
     "@mediapipe/hands": "npm:^0.4.1675469240"
     "@mediapipe/pose": "npm:^0.5.1675469404"
