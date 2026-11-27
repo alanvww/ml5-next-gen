@@ -36,6 +36,7 @@ describe("interactive picker", () => {
 
   test("parseSelection accepts numbers, names and 'all'", () => {
     const names = ["handpose", "facemesh", "bodypose"];
+    expect(parseSelection("2", names)).toEqual(["facemesh"]);
     expect(parseSelection("1, bodypose", names)).toEqual([
       "handpose",
       "bodypose",
@@ -77,6 +78,15 @@ describe("interactive picker", () => {
       "blazepose-lite",
       "blazepose-heavy",
     ]);
+  });
+
+  test("leaves out models that do not have the chosen runtime", async () => {
+    // models (handpose + objectdetection), runtime, handpose variants, confirm
+    const result = await runPicker(
+      scripted(["handpose, objectdetection", "mediapipe", "", ""])
+    );
+    expect(result.models).toEqual(["handpose"]);
+    expect(result.variants).toEqual({ handpose: ["full"] });
   });
 
   test("returns null when nothing is chosen or the summary is declined", async () => {

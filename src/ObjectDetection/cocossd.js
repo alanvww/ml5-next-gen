@@ -10,6 +10,7 @@
 import * as tf from "@tensorflow/tfjs";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
 import { mediaReady } from "../utils/imageUtilities";
+import { resolveModelUrls } from "../utils/modelResolver";
 
 const DEFAULTS = {
   base: "lite_mobilenet_v2",
@@ -19,6 +20,7 @@ const DEFAULTS = {
 export class CocoSsd {
   constructor(options = {}) {
     this.model = null;
+    this.options = options;
     this.config = {
       base: options.base || DEFAULTS.base,
       modelUrl: options.modelUrl || DEFAULTS.modelUrl,
@@ -29,6 +31,13 @@ export class CocoSsd {
     await tf.setBackend("webgl"); // this line resolves warning : performance is poor on webgpu backend
     await tf.ready();
 
+    // Point modelUrl at local files when the `modelPath` option is set.
+    await resolveModelUrls({
+      modelName: "objectdetection",
+      variant: this.config.base,
+      modelConfig: this.config,
+      userOptions: this.options,
+    });
     this.model = await cocoSsd.load(this.config);
     return this;
   }

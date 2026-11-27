@@ -3,6 +3,7 @@
   "models": {
     "handpose": {
       "label": "HandPose",
+      "function": "handPose",
       "dir": "handpose",
       "defaultVariants": ["full"],
       "variants": {
@@ -54,6 +55,7 @@
     },
     "facemesh": {
       "label": "FaceMesh",
+      "function": "faceMesh",
       "dir": "facemesh",
       "defaultVariants": ["default"],
       "variants": {
@@ -105,6 +107,7 @@
     },
     "bodypose": {
       "label": "BodyPose",
+      "function": "bodyPose",
       "dir": "bodypose",
       "defaultVariants": ["movenet", "blazepose"],
       "aliases": {
@@ -199,6 +202,41 @@
           "pose_solution_wasm_bin.js",
           "pose_solution_wasm_bin.wasm"
         ]
+      }
+    },
+    "objectdetection": {
+      "label": "ObjectDetection",
+      "function": "objectDetection",
+      "dir": "objectdetection",
+      "defaultVariants": ["lite_mobilenet_v2"],
+      "variants": {
+        "lite_mobilenet_v2": {
+          "description": "COCO-SSD, the objectDetection default",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model",
+              "url": "https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2"
+            }
+          }
+        },
+        "mobilenet_v1": {
+          "description": "COCO-SSD (base: \"mobilenet_v1\")",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-mobilenet-v1",
+              "url": "https://storage.googleapis.com/tfjs-models/savedmodel/ssd_mobilenet_v1"
+            }
+          }
+        },
+        "mobilenet_v2": {
+          "description": "COCO-SSD (base: \"mobilenet_v2\")",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-mobilenet-v2",
+              "url": "https://storage.googleapis.com/tfjs-models/savedmodel/ssd_mobilenet_v2"
+            }
+          }
+        }
       }
     }
   }

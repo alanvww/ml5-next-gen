@@ -307,6 +307,26 @@ describe("resolveModelUrls", () => {
     expect(modelConfig.modelUrl).toBe(`${leaf}/model.json`);
   });
 
+  test("models without a runtime option resolve to their TFJS files", async () => {
+    const root = "./ml5-models/objectdetection";
+    mockServer({
+      [`${root}/manifest.json`]: manifest({
+        tfjs: { variants: ["lite_mobilenet_v2"] },
+      }),
+    });
+    const modelConfig = { base: "lite_mobilenet_v2", modelUrl: undefined };
+    await resolveModelUrls({
+      modelName: "objectdetection",
+      variant: "lite_mobilenet_v2",
+      modelConfig,
+      userOptions: { modelPath: root },
+    });
+    expect(modelConfig).toEqual({
+      base: "lite_mobilenet_v2",
+      modelUrl: `${root}/tfjs/model/model.json`,
+    });
+  });
+
   test("'auto' uses ./ml5-models when a manifest is there and the network otherwise", async () => {
     mockServer({});
     const remote = { runtime: "tfjs" };

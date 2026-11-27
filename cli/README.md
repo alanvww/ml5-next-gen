@@ -59,6 +59,7 @@ Per model it holds:
   they map to, the local folder, and the source URL) and the MediaPipe
   `.tflite` files it needs. A variant without a `mediapipe` key has no
   MediaPipe runtime (MoveNet).
+- `function`: the ml5 function name, used in the usage hint `prefetch` prints.
 - `defaultVariants`: what `prefetch <model>` stages without `--variant`.
 - `aliases`: alternative `--variant` spellings.
 - `mediapipe`: the npm package, its pinned version, the files every variant
@@ -123,8 +124,9 @@ than was asked for (FaceMesh's MediaPipe variants share one set of files). The
 
 ## Known follow-ups
 
-- Only handPose, faceMesh and bodyPose are registered. Other models need a
-  registry entry and a `resolveModelUrls()` call in their `loadModel()`.
+- handPose, faceMesh, bodyPose and objectDetection are registered. Other
+  models need a registry entry and a `resolveModelUrls()` call where they
+  load (`src/ObjectDetection/cocossd.js` shows the smallest case).
 - The Transformers.js-backed models load through `@huggingface/transformers`
   and need a different mechanism (`env.localModelPath`).
 - TFJS sources are `tfhub.dev` URLs, which redirect through Kaggle to signed

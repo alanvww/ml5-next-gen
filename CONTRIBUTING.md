@@ -334,7 +334,7 @@ When bumping a `@mediapipe/*` or `@tensorflow-models/*` package, changing an ups
 3. Run `node bin/ml5.js cache prefetch <model> --variant all --runtime both --force`, then `node bin/ml5.js cache verify`.
 4. Test the corresponding `*-offline-local-model-cli` example with Wi-Fi off, or with DevTools → Network open, and confirm every model file is loaded from `localhost`.
 
-To give another ml5 model offline support, add it to the registry and call `resolveModelUrls()` (`src/utils/modelResolver.js`) in its `loadModel()`, passing the variant the user's options select. `src/HandPose/index.js` is the smallest example. See `cli/README.md` for how the CLI is organised.
+To give another ml5 model offline support, add it to the registry and call `resolveModelUrls()` (`src/utils/modelResolver.js`) in its `loadModel()`, passing the variant the user's options select. `src/ObjectDetection/cocossd.js` is the smallest example; `src/HandPose/index.js` shows a model with two runtimes. See `cli/README.md` for how the CLI is organised.
 
 ### [handleOptions](src\utils\handleOptions.js)
 

@@ -88,7 +88,11 @@ async function runPicker(ask) {
     const defaults = resolveVariants(model).filter((variant) =>
       available.includes(variant)
     );
-    if (available.length <= 1) {
+    if (available.length === 0) {
+      console.log(`\n${model.label} has no ${runtime} files; leaving it out.`);
+      continue;
+    }
+    if (available.length === 1) {
       variants[name] = available;
       continue;
     }
@@ -113,13 +117,16 @@ async function runPicker(ask) {
     );
   }
 
+  const chosen = models.filter((name) => variants[name]);
+  if (chosen.length === 0) return null;
+
   console.log("\nAbout to download:");
-  models.forEach((name) =>
+  chosen.forEach((name) =>
     console.log(`  ${name}: ${variants[name].join(", ")} (${runtime})`)
   );
   const confirmed = await ask("\nContinue? [Y/n] ");
   if (/^n/i.test(confirmed.trim())) return null;
-  return { models, runtime, variants };
+  return { models: chosen, runtime, variants };
 }
 
 module.exports = { runPicker, parseSelection };

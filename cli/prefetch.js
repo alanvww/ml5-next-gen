@@ -47,12 +47,6 @@ const { stageMediaPipe } = require("./utils/stage-mediapipe");
 const USAGE =
   "Usage: ml5 cache prefetch [model...] [--all] [--runtime tfjs|mediapipe|both] [--variant <name>[,<name>]|all] [--out <dir>] [--force]";
 
-const SKETCH_FUNCTIONS = {
-  handpose: "handPose",
-  facemesh: "faceMesh",
-  bodypose: "bodyPose",
-};
-
 function union(a, b) {
   return [...new Set([...a, ...b])];
 }
@@ -89,7 +83,13 @@ async function planJobs(args) {
     const requested = splitList(options.variant);
     const jobs = names.map((name) => {
       const model = getModel(name);
-      return { model, variants: resolveVariants(model, requested) };
+      // A model the user named must be staged; with --all, models that do
+      // not have the requested runtime are skipped instead.
+      return {
+        model,
+        variants: resolveVariants(model, requested),
+        strict: !options.all,
+      };
     });
     return { ...shared, runtime, jobs };
   }
@@ -149,7 +149,15 @@ async function stageMediaPipeRuntime({ model, variants, root, force }) {
   };
 }
 
-async function prefetchModel({ model, variants, runtime, out, force, quiet }) {
+async function prefetchModel({
+  model,
+  variants,
+  strict,
+  runtime,
+  out,
+  force,
+  quiet,
+}) {
   const root = modelRoot(out, model.dir);
   const previous = await readManifest(root);
   const runtimes = isCurrentManifest(previous) ? { ...previous.runtimes } : {};
@@ -193,11 +201,14 @@ async function prefetchModel({ model, variants, runtime, out, force, quiet }) {
     staged += 1;
   }
   if (staged === 0) {
-    throw new Error(
-      `${model.name}: none of the requested variants (${variants.join(
-        ", "
-      )}) are available for --runtime ${runtime}.`
-    );
+    const reason = `${
+      model.name
+    }: none of the requested variants (${variants.join(
+      ", "
+    )}) are available for --runtime ${runtime}.`;
+    if (strict) throw new Error(reason);
+    log(`  ! skipped ${reason}`, quiet);
+    return null;
   }
 
   const manifest = {
@@ -225,17 +236,16 @@ async function prefetch(args) {
   }
   const roots = [];
   for (const job of plan.jobs) {
-    roots.push({
-      model: job.model,
-      root: await prefetchModel({
-        ...job,
-        runtime: plan.runtime,
-        out: plan.out,
-        force: plan.force,
-        quiet: plan.quiet,
-      }),
+    const root = await prefetchModel({
+      ...job,
+      runtime: plan.runtime,
+      out: plan.out,
+      force: plan.force,
+      quiet: plan.quiet,
     });
+    if (root) roots.push({ model: job.model, root });
   }
+  if (roots.length === 0) return;
   log(
     "\nUse the files in your sketch with the modelPath option, for example:",
     plan.quiet
@@ -248,8 +258,7 @@ async function prefetch(args) {
     const shown = path.isAbsolute(sketchPath)
       ? `./ml5-models/${model.dir}`
       : sketchPath;
-    const fn = SKETCH_FUNCTIONS[model.name] || model.name;
-    log(`  ml5.${fn}({ modelPath: "${shown}" });`, plan.quiet);
+    log(`  ml5.${model.function}({ modelPath: "${shown}" });`, plan.quiet);
   }
   log(
     "modelPath is relative to your index.html. See docs/offline-mode.md for the rest of the offline setup.",

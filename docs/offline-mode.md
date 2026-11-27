@@ -54,7 +54,7 @@ npx ml5 cache prefetch
 Or name them:
 
 ```bash
-npx ml5 cache prefetch handpose facemesh bodypose
+npx ml5 cache prefetch handpose facemesh bodypose objectdetection
 ```
 
 ```bash
@@ -83,6 +83,9 @@ Some options in your sketch select a different model file. If your sketch uses o
 | bodyPose | `"BlazePose"` | `blazepose` (default) |
 | bodyPose | `"BlazePose"`, `modelType: "lite"` | `blazepose-lite` |
 | bodyPose | `"BlazePose"`, `modelType: "heavy"` | `blazepose-heavy` |
+| objectDetection | default (COCO-SSD) | `lite_mobilenet_v2` (default) |
+| objectDetection | `base: "mobilenet_v1"` | `mobilenet_v1` |
+| objectDetection | `base: "mobilenet_v2"` | `mobilenet_v2` |
 
 ```bash
 npx ml5 cache prefetch handpose --variant lite
@@ -98,7 +101,7 @@ If the sketch asks for a variant that is not in the folder, ml5 stops with an er
 
 ### Runtimes
 
-handPose, faceMesh and bodyPose (BlazePose) can run on two runtimes. `prefetch` downloads the TensorFlow.js files by default, because that is what ml5 uses unless a sketch sets `runtime`.
+handPose, faceMesh and bodyPose (BlazePose) can run on two runtimes; objectDetection only has TensorFlow.js files. `prefetch` downloads the TensorFlow.js files by default, because that is what ml5 uses unless a sketch sets `runtime`.
 
 ```bash
 npx ml5 cache prefetch handpose --runtime mediapipe
@@ -108,7 +111,7 @@ npx ml5 cache prefetch handpose --runtime mediapipe
 npx ml5 cache prefetch handpose --runtime both
 ```
 
-- `tfjs` (default): smaller downloads, roughly 2 to 13 MB per model. The ml5 maintainers recommend it for installations that run for hours.
+- `tfjs` (default): smaller downloads, roughly 2 to 18 MB per model for the default variant. The ml5 maintainers recommend it for installations that run for hours.
 - `mediapipe`: larger, roughly 16 to 21 MB per model for the default variant. Only needed when your sketch sets `runtime: "mediapipe"`.
 
 In the sketch:
@@ -197,7 +200,7 @@ Downloads need internet access to `tfhub.dev`, `www.kaggle.com` and `storage.goo
 
 ## Known limitations
 
-- `modelPath` covers handPose, faceMesh and bodyPose. Other ml5 models still load from the internet.
+- `modelPath` covers handPose, faceMesh, bodyPose and objectDetection. Other ml5 models still load from the internet.
 - Do not open sketches with `file://`; use a local web server.
 - Strict Content Security Policy rules can block MediaPipe's script loading.
 - The p5.js Web Editor needs the internet itself. Download the sketch and follow [Moving a Web Editor sketch offline](./offline-from-web-editor.md).

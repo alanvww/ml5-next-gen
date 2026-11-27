@@ -104,3 +104,13 @@ Plus one file per variant:
 - `blazepose`: `pose_landmark_full.tflite`
 - `blazepose-lite`: `pose_landmark_lite.tflite`
 - `blazepose-heavy`: `pose_landmark_heavy.tflite`
+
+## ObjectDetection (`objectdetection`)
+
+### TensorFlow.js
+
+| Variant | Part | Local folder | Source |
+| --- | --- | --- | --- |
+| `lite_mobilenet_v2` (default) | model | `tfjs/model/` | https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2 |
+| `mobilenet_v1` | model | `tfjs/model-mobilenet-v1/` | https://storage.googleapis.com/tfjs-models/savedmodel/ssd_mobilenet_v1 |
+| `mobilenet_v2` | model | `tfjs/model-mobilenet-v2/` | https://storage.googleapis.com/tfjs-models/savedmodel/ssd_mobilenet_v2 |
