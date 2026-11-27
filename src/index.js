@@ -13,6 +13,7 @@ import bodySegmentation from "./BodySegmentation";
 import depthEstimation from "./DepthEstimation";
 import communityStatement from "./utils/communityStatement";
 import speechToText from "./SpeechToText";
+import { useCache, cacheStatus, clearCache } from "./utils/modelCache";
 import * as tf from "@tensorflow/tfjs";
 import * as tfvis from "@tensorflow/tfjs-vis";
 import p5Utils from "./utils/p5Utils";
@@ -41,6 +42,9 @@ const ml5 = Object.assign({ p5Utils }, withPreload, {
   tf,
   tfvis,
   setBackend,
+  useCache,
+  cacheStatus,
+  clearCache,
   version: packageInfo.version,
   setP5: p5Utils.setP5.bind(p5Utils),
 });
