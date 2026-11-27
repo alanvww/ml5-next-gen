@@ -10,11 +10,8 @@ const path = require("node:path");
 const { fetchWithRetry, downloadToFile, exists } = require("./fetch");
 
 function toModelJsonUrl(url) {
-  if (url.includes("tfhub.dev"))
-    return `${url.replace(/\/+$/, "")}/model.json?tfjs-format=file`;
-  return url.endsWith("model.json")
-    ? url
-    : `${url.replace(/\/+$/, "")}/model.json`;
+  if (url.includes("tfhub.dev")) return `${url.replace(/\/+$/, "")}/model.json?tfjs-format=file`;
+  return url.endsWith("model.json") ? url : `${url.replace(/\/+$/, "")}/model.json`;
 }
 
 function dirnameUrl(url) {

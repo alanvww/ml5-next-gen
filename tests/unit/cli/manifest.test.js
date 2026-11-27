@@ -1,11 +1,7 @@
 const fs = require("node:fs/promises");
 const os = require("node:os");
 const path = require("node:path");
-const {
-  writeManifest,
-  readManifest,
-  verifyManifest,
-} = require("../../../cli/utils/manifest");
+const { writeManifest, readManifest, verifyManifest } = require("../../../cli/utils/manifest");
 const { sha256File } = require("../../../cli/utils/sha");
 
 describe("CLI manifest utilities", () => {
@@ -19,13 +15,7 @@ describe("CLI manifest utilities", () => {
       $schema: "ml5-models-manifest-v2",
       runtimes: {
         tfjs: {
-          files: [
-            {
-              path: "tfjs/model.json",
-              size: stat.size,
-              sha256: await sha256File(filePath),
-            },
-          ],
+          files: [{ path: "tfjs/model.json", size: stat.size, sha256: await sha256File(filePath) }],
         },
       },
     };

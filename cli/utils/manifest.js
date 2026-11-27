@@ -39,10 +39,7 @@ function isMl5Manifest(manifest) {
 
 async function writeManifest(root, manifest) {
   await fs.mkdir(root, { recursive: true });
-  await fs.writeFile(
-    path.join(root, "manifest.json"),
-    `${JSON.stringify(manifest, null, 2)}\n`
-  );
+  await fs.writeFile(path.join(root, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
 }
 
 /** Size + SHA-256 records for files given as POSIX paths relative to root. */
@@ -70,11 +67,7 @@ async function verifyManifest(root, manifest) {
       try {
         const stat = await fs.stat(fullPath);
         const sha256 = await sha256File(fullPath);
-        results.push({
-          ...file,
-          runtime,
-          ok: stat.size === file.size && sha256 === file.sha256,
-        });
+        results.push({ ...file, runtime, ok: stat.size === file.size && sha256 === file.sha256 });
       } catch (error) {
         results.push({ ...file, runtime, ok: false });
       }

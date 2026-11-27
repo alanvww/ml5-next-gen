@@ -32,10 +32,8 @@ Files go to ./ml5-models/<model>/ unless --out is given. In your sketch:
 
 module.exports = async function cli(args) {
   // Global help/version flags short-circuit before subcommand routing.
-  if (args.length === 0 || args.includes("--help") || args.includes("-h"))
-    return help();
-  if (args.includes("--version"))
-    return console.log(require("../package.json").version);
+  if (args.length === 0 || args.includes("--help") || args.includes("-h")) return help();
+  if (args.includes("--version")) return console.log(require("../package.json").version);
   const [group, command, ...rest] = args;
   if (group !== "cache") return help();
   if (command === "prefetch") return prefetch(rest);
