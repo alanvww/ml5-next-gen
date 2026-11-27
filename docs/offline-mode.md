@@ -95,7 +95,7 @@ npx ml5 cache prefetch handpose --variant lite
 npx ml5 cache prefetch bodypose --variant all
 ```
 
-Running `prefetch` again adds to the folder; variants you downloaded earlier stay.
+Running `prefetch` again adds to the folder; variants you downloaded earlier stay. Files that are already there are not downloaded again; add `--force` to replace them.
 
 If the sketch asks for a variant that is not in the folder, ml5 stops with an error that names the missing variant and the command that downloads it.
 
@@ -111,7 +111,7 @@ npx ml5 cache prefetch handpose --runtime mediapipe
 npx ml5 cache prefetch handpose --runtime both
 ```
 
-- `tfjs` (default): smaller downloads, roughly 2 to 18 MB per model for the default variant. The ml5 maintainers recommend it for installations that run for hours.
+- `tfjs` (default): smaller downloads, roughly 2 to 21 MB per model for the default variants. The ml5 maintainers recommend it for installations that run for hours.
 - `mediapipe`: larger, roughly 16 to 21 MB per model for the default variant. Only needed when your sketch sets `runtime: "mediapipe"`.
 
 In the sketch:
@@ -153,7 +153,7 @@ npx ml5 cache clear handpose
 ```
 
 - `list` shows what has been downloaded and how large it is.
-- `verify` re-checks every file against the checksums in `manifest.json`. Run it after copying the folder to another machine or a USB stick.
+- `verify` re-checks every file against the checksums in `manifest.json`. Run it after copying the folder to another machine or a USB stick. If a file is missing or changed, it prints the `prefetch ... --force` command that repairs it.
 - `clear` deletes model folders. It only removes folders that contain an ml5 manifest.
 
 All commands accept `--out <dir>`.
@@ -174,6 +174,16 @@ All commands accept `--out <dir>`.
 | `"auto"` | Use `./ml5-models/<model>` when it exists, otherwise load from the internet as usual. Handy for a sketch that is shared both ways. |
 | not set | Load from the internet as usual. |
 
+Each model has its own folder. `modelPath` goes in the options object:
+
+```js
+ml5.handPose({ modelPath: "./ml5-models/handpose" });
+ml5.faceMesh({ modelPath: "./ml5-models/facemesh" });
+ml5.bodyPose({ modelPath: "./ml5-models/bodypose" });
+ml5.bodyPose("BlazePose", { modelPath: "./ml5-models/bodypose" });
+ml5.objectDetection({ modelPath: "./ml5-models/objectdetection" });
+```
+
 URL options you set yourself (`detectorModelUrl`, `landmarkModelUrl`, `modelUrl`, `solutionPath`) take priority over `modelPath`.
 
 `modelPath` also accepts folders you filled by hand, without a `manifest.json`, as long as they use the layout above. See the [manual model setup guides](./manual-model-setup/README.md).
@@ -183,6 +193,8 @@ URL options you set yourself (`detectorModelUrl`, `landmarkModelUrl`, `modelUrl`
 - `examples/handPose-keypoints-offline-local-model-cli/`
 - `examples/faceMesh-keypoints-offline-local-model-cli/`
 - `examples/bodyPose-keypoints-offline-local-model-cli/`
+
+objectDetection does not have its own offline example yet; it works the same way with `modelPath: "./ml5-models/objectdetection"`.
 
 ## Troubleshooting
 

@@ -13,13 +13,19 @@ This is the slower, more hands-on path. If you are comfortable using a terminal,
 | --- | --- |
 | I want the easiest setup and I can use a terminal. | [`../offline-mode.md`](../offline-mode.md) |
 | I do not want to use a terminal, or I want to understand every file. | One of the manual guides below. |
-| I am using the p5.js Web Editor. | Local bundled files are not a good fit there — use normal CDN loading, or browser caching when available. |
+| I am using the p5.js Web Editor. | The Web Editor itself needs the internet. Download your sketch first, then follow [`../offline-from-web-editor.md`](../offline-from-web-editor.md). |
 
 ## Pick your model
 
 - [HandPose manual setup](./manual-setup-handpose.md)
 - [FaceMesh manual setup](./manual-setup-facemesh.md)
 - [BodyPose manual setup](./manual-setup-bodypose.md)
+
+ObjectDetection does not have its own step-by-step guide. Its files are listed in [Where to download every model file](./where-to-download-models.md#objectdetection-tfjs), and the steps are the same as the TFJS path in the guides above.
+
+## Do not forget p5.js and ml5.js
+
+Local model files are only one of three things a sketch downloads. For a sketch that runs with no internet at all, `p5.js` and `ml5.js` have to be local files too, not CDN `<script>` links. See [What "offline" needs](../offline-mode.md#what-offline-needs).
 
 ## Reference pages
 

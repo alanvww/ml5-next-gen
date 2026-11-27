@@ -19,23 +19,31 @@ Check:
 - Is `ml5-models/` next to the `index.html` file that opened in the browser?
 - Does your `modelPath` match the folder name?
 
+## The console says "no local model files found at modelPath ..."
+
+ml5 could not find model files in the folder `modelPath` points to. The error lists the files it looked for. Open one of those addresses in the browser to see what your local server returns.
+
+Check that `modelPath` points at the model root, such as `./ml5-models/handpose`, not at the `tfjs/` or `mediapipe/` folder inside it.
+
+If the path is right, the files may be for a different option than the sketch uses. `modelType: "lite"`, `refineLandmarks: true` and similar options each need their own files; the folder names in the error show which ones ml5 wanted. For MediaPipe, the `.tflite` file has to match `modelType`.
+
+## The console says "... does not contain ... files for the '...' variant"
+
+The folder is there, but not the files your sketch's options need. For example, `runtime: "mediapipe"` needs the `mediapipe/` folder.
+
+Either download the files for that option (see [`../model-urls.md`](../model-urls.md) for every variant's URL and folder), or change the option to match the files you have.
+
 ## The page loads, but nothing is detected
 
-This is often a runtime mismatch.
+First open DevTools → Console. If ml5 could not load the model, there is an error there; see the two sections above.
 
-For TFJS files, use a model root such as:
+If there is no error, make sure your webcam permission is allowed and your face, hand, or body is visible in the video.
 
-```js
-ml5.handPose({ modelPath: "./ml5-models/handpose" });
-```
-
-For MediaPipe files, include the MediaPipe runtime option when the model supports it:
+When a folder has both `tfjs/` and `mediapipe/` files, ml5 uses TFJS unless the sketch sets `runtime: "mediapipe"`:
 
 ```js
 ml5.handPose({ runtime: "mediapipe", modelPath: "./ml5-models/handpose" });
 ```
-
-Also make sure your webcam permission is allowed and your face, hand, or body is visible in the video.
 
 ## I see MIME type or `application/octet-stream` errors
 
@@ -49,13 +57,15 @@ Then open `http://localhost:8000`.
 
 ## Files still load from `cdn.jsdelivr.net`, `tfhub.dev`, or `storage.googleapis.com`
 
-That usually means ml5 could not find your local files and fell back to its normal online URLs.
+ml5 does not quietly switch to the internet when `modelPath` is a folder path: if the files are missing, it stops with an error. So files that still come from the internet usually mean one of these:
 
-Check the Network tab for the first local 404. Fix that missing file or folder first.
+- The model that loads them has no `modelPath` option. Each ml5 model in the sketch needs its own.
+- `modelPath` is `"auto"`. `"auto"` only uses folders made by `ml5 cache prefetch`. For a folder you filled by hand, write the path, such as `"./ml5-models/handpose"`.
+- The request is for `p5.js` or `ml5.js` itself. Those come from `<script>` tags in `index.html`; see [What "offline" needs](../offline-mode.md#what-offline-needs).
 
 ## The `model.json` mentions files I did not download
 
-Open `model.json` and look for `weightsManifest`. Every filename in the `paths` list must be downloaded into the same folder as that `model.json`.
+Open `model.json` and look for `weightsManifest`. Every filename in the `paths` list must be downloaded into the same folder as that `model.json`. Keep the names exactly as listed; some models' weight files have no `.bin` ending.
 
 Sometimes a model has one shard. Sometimes it has several. Trust the `model.json` you downloaded.
 
@@ -65,7 +75,7 @@ Model hosts can change how files are split. The important rule is: download ever
 
 ## Can I use this in the p5.js Web Editor?
 
-The p5.js Web Editor is wonderful for sharing sketches, but it is not a good place to bundle large local model folders. For Web Editor sketches, use the normal online loading path, or browser caching if available.
+The p5.js Web Editor is wonderful for sharing sketches, but it needs the internet itself, and it is not a good place to bundle large local model folders. To run a Web Editor sketch offline, download it and follow [Moving a Web Editor sketch offline](../offline-from-web-editor.md).
 
 ## My sketch is in a subfolder. Where does `ml5-models/` go?
 

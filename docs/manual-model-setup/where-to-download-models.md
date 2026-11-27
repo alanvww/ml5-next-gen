@@ -18,7 +18,7 @@ To download a TFJS model manually:
 
 The `?tfjs-format=file` part is important for TFHub links. It asks TFHub for browser-friendly files instead of a webpage.
 
-The tables below cover the default model of each kind. If your sketch uses another variant (`modelType: "lite"`, `refineLandmarks: true`, single-pose MoveNet, BlazePose `lite` or `heavy`), the folder name is different, for example `tfjs/landmark-lite/`. [`../model-urls.md`](../model-urls.md) lists the source URL and local folder for every variant.
+The tables below cover the default model of each kind. If your sketch uses another variant (`modelType: "lite"`, `refineLandmarks: true`, single-pose MoveNet, BlazePose `lite` or `heavy`, another COCO-SSD `base`), the folder name is different, for example `tfjs/landmark-lite/`. [`../model-urls.md`](../model-urls.md) lists the source URL and local folder for every variant.
 
 ### HandPose TFJS
 
@@ -41,6 +41,20 @@ The tables below cover the default model of each kind. If your sketch uses anoth
 | MoveNet | [MoveNet multipose lightning model.json](https://tfhub.dev/google/tfjs-model/movenet/multipose/lightning/1/model.json?tfjs-format=file) | `ml5-models/bodypose/tfjs/model/model.json` |
 | BlazePose detector | [BlazePose detector model.json](https://tfhub.dev/mediapipe/tfjs-model/blazepose_3d/detector/1/model.json?tfjs-format=file) | `ml5-models/bodypose/tfjs/detector/model.json` |
 | BlazePose landmark | [BlazePose landmark model.json](https://tfhub.dev/mediapipe/tfjs-model/blazepose_3d/landmark/full/2/model.json?tfjs-format=file) | `ml5-models/bodypose/tfjs/landmark/model.json` |
+
+### ObjectDetection TFJS
+
+| Piece | Download `model.json` from | Put it here |
+| --- | --- | --- |
+| COCO-SSD | [COCO-SSD model.json](https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/model.json) | `ml5-models/objectdetection/tfjs/model/model.json` |
+
+The weight files for this model have no `.bin` ending (`group1-shard1of5` to `group1-shard5of5`). Save them with exactly those names. ObjectDetection only has TFJS files.
+
+In your sketch:
+
+```js
+ml5.objectDetection({ modelPath: "./ml5-models/objectdetection" });
+```
 
 ## MediaPipe versions
 
@@ -82,10 +96,10 @@ Shared files:
 - [hands_solution_wasm_bin.js](https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands_solution_wasm_bin.js)
 - [hands_solution_wasm_bin.wasm](https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands_solution_wasm_bin.wasm)
 
-Choose one landmark model:
+Download the landmark model that matches your sketch's `modelType`:
 
-- Lite, smaller and usually faster: [hand_landmark_lite.tflite](https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hand_landmark_lite.tflite)
-- Full, larger and usually more accurate: [hand_landmark_full.tflite](https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hand_landmark_full.tflite)
+- Full, the default, larger and usually more accurate: [hand_landmark_full.tflite](https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hand_landmark_full.tflite)
+- Lite, smaller and usually faster, for `modelType: "lite"`: [hand_landmark_lite.tflite](https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hand_landmark_lite.tflite)
 
 ## FaceMesh MediaPipe files
 
@@ -117,11 +131,11 @@ Shared files:
 - [pose_solution_wasm_bin.js](https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5.1675469404/pose_solution_wasm_bin.js)
 - [pose_solution_wasm_bin.wasm](https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5.1675469404/pose_solution_wasm_bin.wasm)
 
-Choose one landmark model:
+Download the landmark model that matches your sketch's `modelType`:
 
-- Lite, smaller and usually faster: [pose_landmark_lite.tflite](https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5.1675469404/pose_landmark_lite.tflite)
-- Full, balanced default: [pose_landmark_full.tflite](https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5.1675469404/pose_landmark_full.tflite)
-- Heavy, largest and usually most accurate: [pose_landmark_heavy.tflite](https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5.1675469404/pose_landmark_heavy.tflite)
+- Full, the balanced default: [pose_landmark_full.tflite](https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5.1675469404/pose_landmark_full.tflite)
+- Lite, smaller and usually faster, for `modelType: "lite"`: [pose_landmark_lite.tflite](https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5.1675469404/pose_landmark_lite.tflite)
+- Heavy, largest and usually most accurate, for `modelType: "heavy"`: [pose_landmark_heavy.tflite](https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5.1675469404/pose_landmark_heavy.tflite)
 
 ## Licensing and attribution
 

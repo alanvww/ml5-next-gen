@@ -61,6 +61,8 @@ Use this in your sketch:
 ml5.handPose({ modelPath: "./ml5-models/handpose" });
 ```
 
+These are the files for the default `modelType: "full"`. A sketch that sets `modelType: "lite"` needs different files in `tfjs/detector-lite/` and `tfjs/landmark-lite/`; [`../model-urls.md`](../model-urls.md) has their URLs.
+
 ## Path B: MediaPipe
 
 Create this folder:
@@ -81,10 +83,12 @@ Download these shared files into that folder:
 - [hands_solution_wasm_bin.js](https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands_solution_wasm_bin.js)
 - [hands_solution_wasm_bin.wasm](https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands_solution_wasm_bin.wasm)
 
-Then choose one landmark model:
+Then download the landmark model that matches your sketch's `modelType`:
 
-- Smaller: [hand_landmark_lite.tflite](https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hand_landmark_lite.tflite)
-- Default/full: [hand_landmark_full.tflite](https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hand_landmark_full.tflite)
+- Default (`modelType: "full"`): [hand_landmark_full.tflite](https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hand_landmark_full.tflite)
+- Smaller, only if your sketch sets `modelType: "lite"`: [hand_landmark_lite.tflite](https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hand_landmark_lite.tflite)
+
+If the file does not match `modelType`, ml5 stops with a "no local model files found" error.
 
 You can also browse the files at [jsdelivr's `@mediapipe/hands` page](https://www.jsdelivr.com/package/npm/@mediapipe/hands).
 
@@ -111,6 +115,8 @@ Then open `http://localhost:8000`.
 ## Verify it loaded locally
 
 Open DevTools → Network, reload, and check that model files load from `localhost`. They should not load from `cdn.jsdelivr.net`, `tfhub.dev`, or `storage.googleapis.com`.
+
+If `p5.js` or `ml5.js` still load from a CDN, the sketch will not start without internet. See [What "offline" needs](../offline-mode.md#what-offline-needs).
 
 ## See also
 

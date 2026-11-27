@@ -38,7 +38,7 @@ ml5.faceMesh({ ...options, modelPath: "./ml5-models/facemesh" });
 ml5.faceMesh({ ...options, runtime: "mediapipe", modelPath: "./ml5-models/facemesh" });
 ```
 
-For a first manual setup, keep `refineLandmarks: false`. The refined landmarks option may require extra attention-model assets that are easier to manage with the CLI.
+For a first manual setup, keep `refineLandmarks: false`. With the TFJS files, `refineLandmarks: true` needs a different landmark model in `tfjs/landmark-refined/`; [`../model-urls.md`](../model-urls.md) has its URL. The MediaPipe files below cover both settings.
 
 ## Path A: TFJS, recommended for beginners
 
@@ -107,6 +107,8 @@ Then open `http://localhost:8000`.
 ## Verify it loaded locally
 
 Open DevTools → Network, reload, and check that model files load from `localhost`. They should not load from `cdn.jsdelivr.net`, `tfhub.dev`, or `storage.googleapis.com`.
+
+If `p5.js` or `ml5.js` still load from a CDN, the sketch will not start without internet. See [What "offline" needs](../offline-mode.md#what-offline-needs).
 
 ## See also
 
