@@ -59,7 +59,13 @@ Per model it holds:
   they map to, the local folder, and the source URL) and the MediaPipe
   `.tflite` files it needs. A variant without a `mediapipe` key has no
   MediaPipe runtime (MoveNet).
+  A TFJS source is normally a folder that holds `model.json`. A source that
+  ends in `.json` is the model file itself (BodyPix); it is still saved
+  locally as `model.json`. `extraFiles` lists files that sit next to the
+  model and are downloaded with it (`metadata.json`).
 - `function`: the ml5 function name, used in the usage hint `prefetch` prints.
+- `modelName`: optional. The model name that hint puts before the options,
+  for functions whose default is a different model (`"ARPortraitDepth"`).
 - `defaultVariants`: what `prefetch <model>` stages without `--variant`.
 - `aliases`: alternative `--variant` spellings.
 - `mediapipe`: the npm package, its pinned version, the files every variant
@@ -124,9 +130,13 @@ than was asked for (FaceMesh's MediaPipe variants share one set of files). The
 
 ## Known follow-ups
 
-- handPose, faceMesh, bodyPose and objectDetection are registered. Other
-  models need a registry entry and a `resolveModelUrls()` call where they
-  load (`src/ObjectDetection/cocossd.js` shows the smallest case).
+- Every TensorFlow.js model in ml5 is registered. A new one needs a registry
+  entry and a `resolveModelUrls()` call where it loads
+  (`src/ObjectDetection/cocossd.js` shows the smallest case).
+- Darknet and DoodleNet are downloaded from the `ml5-data-and-models` GitHub
+  repo directly. The browser loads the same files through jsDelivr, which
+  refused one Darknet weight file when asked from Node (HTTP 403, package
+  size limit).
 - The Transformers.js-backed models load through `@huggingface/transformers`
   and need a different mechanism (`env.localModelPath`).
 - TFJS sources are `tfhub.dev` URLs, which redirect through Kaggle to signed

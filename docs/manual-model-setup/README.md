@@ -21,7 +21,7 @@ This is the slower, more hands-on path. If you are comfortable using a terminal,
 - [FaceMesh manual setup](./manual-setup-facemesh.md)
 - [BodyPose manual setup](./manual-setup-bodypose.md)
 
-ObjectDetection does not have its own step-by-step guide. Its files are listed in [Where to download every model file](./where-to-download-models.md#objectdetection-tfjs), and the steps are the same as the TFJS path in the guides above.
+The other models do not have their own step-by-step guide. The steps are the same as the TFJS path in the guides above. ObjectDetection's files are listed in [Where to download every model file](./where-to-download-models.md#objectdetection-tfjs), and [`../model-urls.md`](../model-urls.md) has the source and local folder for every model and variant.
 
 ## Do not forget p5.js and ml5.js
 

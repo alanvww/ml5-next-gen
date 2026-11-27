@@ -11,7 +11,7 @@ By default a sketch downloads three things from the internet every time it start
 
 | What | Where it normally comes from | Offline |
 | --- | --- | --- |
-| Model files | `tfhub.dev`, `cdn.jsdelivr.net` | `ml5 cache prefetch` puts them in `./ml5-models/` |
+| Model files | `tfhub.dev`, `kaggle.com`, `storage.googleapis.com`, `cdn.jsdelivr.net` | `ml5 cache prefetch` puts them in `./ml5-models/` |
 | ml5.js | a CDN `<script>` tag | a local `ml5.min.js` file, or ml5 bundled into your app |
 | p5.js (if you use it) | a CDN `<script>` tag | a local `p5.js` file, or p5 bundled into your app |
 
@@ -67,6 +67,23 @@ See every model and variant the CLI knows:
 npx ml5 cache models
 ```
 
+### Models
+
+| ml5 function | Name for the CLI | Notes |
+| --- | --- | --- |
+| `ml5.handPose()` | `handpose` | |
+| `ml5.faceMesh()` | `facemesh` | |
+| `ml5.bodyPose()` | `bodypose` | MoveNet and BlazePose |
+| `ml5.objectDetection()` | `objectdetection` | COCO-SSD |
+| `ml5.bodySegmentation()` | `bodysegmentation` | SelfieSegmentation and BodyPix |
+| `ml5.imageClassifier()` | `imageclassifier` | MobileNet, Darknet and DoodleNet |
+| `ml5.featureExtractor()` | `featureextractor` | MobileNet |
+| `ml5.soundClassifier()` | `soundclassifier` | SpeechCommands18w |
+| `ml5.sentiment()` | `sentiment` | MovieReviews |
+| `ml5.depthEstimation()` | `depthestimation` | `"ARPortraitDepth"` only |
+
+See [Known limitations](#known-limitations) for the models that are not covered.
+
 ### Variants
 
 Some options in your sketch select a different model file. If your sketch uses one of these, download the matching variant with `--variant`:
@@ -86,6 +103,18 @@ Some options in your sketch select a different model file. If your sketch uses o
 | objectDetection | default (COCO-SSD) | `lite_mobilenet_v2` (default) |
 | objectDetection | `base: "mobilenet_v1"` | `mobilenet_v1` |
 | objectDetection | `base: "mobilenet_v2"` | `mobilenet_v2` |
+| bodySegmentation | default (SelfieSegmentation) | `selfie` (default) |
+| bodySegmentation | `modelType: "landscape"` | `selfie-landscape` |
+| bodySegmentation | `"BodyPix"` | `bodypix` |
+| bodySegmentation | `"BodyPix"` with `architecture`, `multiplier`, `outputStride` or `quantBytes` | `bodypix-<architecture>-stride<outputStride>-quant<quantBytes>`, such as `bodypix-mobilenet075-stride16-quant2` |
+| imageClassifier | default (MobileNet) | `mobilenet` (default) |
+| imageClassifier | `version` or `alpha` | `mobilenet-v<version>-<alpha>`, such as `mobilenet-v1-025` |
+| imageClassifier | `"darknet"`, `"darknet-tiny"`, `"doodlenet"` | `darknet`, `darknet-tiny`, `doodlenet` |
+| featureExtractor | default | `mobilenet` (default) |
+| featureExtractor | `version` or `alpha` | `mobilenet-v<version>-<alpha>`, such as `mobilenet-v1-025` |
+| soundClassifier | `"SpeechCommands18w"` | `speechcommands18w` (default) |
+| sentiment | `"MovieReviews"` | `moviereviews` (default) |
+| depthEstimation | `"ARPortraitDepth"` | `arportraitdepth` (default) |
 
 ```bash
 npx ml5 cache prefetch handpose --variant lite
@@ -95,13 +124,15 @@ npx ml5 cache prefetch handpose --variant lite
 npx ml5 cache prefetch bodypose --variant all
 ```
 
+BodyPix has 24 combinations of its options, and the default one alone is about 46 MB. Download only the ones your sketch uses; `--variant all` for `bodysegmentation` is several hundred MB.
+
 Running `prefetch` again adds to the folder; variants you downloaded earlier stay. Files that are already there are not downloaded again; add `--force` to replace them.
 
 If the sketch asks for a variant that is not in the folder, ml5 stops with an error that names the missing variant and the command that downloads it.
 
 ### Runtimes
 
-handPose, faceMesh and bodyPose (BlazePose) can run on two runtimes; objectDetection only has TensorFlow.js files. `prefetch` downloads the TensorFlow.js files by default, because that is what ml5 uses unless a sketch sets `runtime`.
+handPose, faceMesh, bodyPose (BlazePose) and bodySegmentation (SelfieSegmentation) can run on two runtimes; every other model only has TensorFlow.js files. `prefetch` downloads the TensorFlow.js files by default, because that is what ml5 uses unless a sketch sets `runtime`.
 
 ```bash
 npx ml5 cache prefetch handpose --runtime mediapipe
@@ -111,8 +142,8 @@ npx ml5 cache prefetch handpose --runtime mediapipe
 npx ml5 cache prefetch handpose --runtime both
 ```
 
-- `tfjs` (default): smaller downloads, roughly 2 to 21 MB per model for the default variants. The ml5 maintainers recommend it for installations that run for hours.
-- `mediapipe`: larger, roughly 16 to 21 MB per model for the default variant. Only needed when your sketch sets `runtime: "mediapipe"`.
+- `tfjs` (default): smaller downloads, from under 1 MB to about 21 MB per model for the default variants. The ml5 maintainers recommend it for installations that run for hours.
+- `mediapipe`: larger, roughly 13 to 21 MB per model for the default variant. Only needed when your sketch sets `runtime: "mediapipe"`.
 
 In the sketch:
 
@@ -182,9 +213,17 @@ ml5.faceMesh({ modelPath: "./ml5-models/facemesh" });
 ml5.bodyPose({ modelPath: "./ml5-models/bodypose" });
 ml5.bodyPose("BlazePose", { modelPath: "./ml5-models/bodypose" });
 ml5.objectDetection({ modelPath: "./ml5-models/objectdetection" });
+ml5.bodySegmentation({ modelPath: "./ml5-models/bodysegmentation" });
+ml5.bodySegmentation("BodyPix", { modelPath: "./ml5-models/bodysegmentation" });
+ml5.imageClassifier({ modelPath: "./ml5-models/imageclassifier" });
+ml5.imageClassifier("doodlenet", { modelPath: "./ml5-models/imageclassifier" });
+ml5.featureExtractor("MobileNet", { modelPath: "./ml5-models/featureextractor" });
+ml5.soundClassifier("SpeechCommands18w", { modelPath: "./ml5-models/soundclassifier" });
+ml5.sentiment("MovieReviews", { modelPath: "./ml5-models/sentiment" });
+ml5.depthEstimation("ARPortraitDepth", { modelPath: "./ml5-models/depthestimation" });
 ```
 
-URL options you set yourself (`detectorModelUrl`, `landmarkModelUrl`, `modelUrl`, `solutionPath`) take priority over `modelPath`.
+URL options you set yourself (such as `detectorModelUrl`, `landmarkModelUrl`, `modelUrl`, `solutionPath`) take priority over `modelPath`.
 
 `modelPath` also accepts folders you filled by hand, without a `manifest.json`, as long as they use the layout above. See the [manual model setup guides](./manual-model-setup/README.md).
 
@@ -194,7 +233,7 @@ URL options you set yourself (`detectorModelUrl`, `landmarkModelUrl`, `modelUrl`
 - `examples/faceMesh-keypoints-offline-local-model-cli/`
 - `examples/bodyPose-keypoints-offline-local-model-cli/`
 
-objectDetection does not have its own offline example yet; it works the same way with `modelPath: "./ml5-models/objectdetection"`.
+The other models do not have their own offline example yet. They work the same way, each with its own folder.
 
 ## Troubleshooting
 
@@ -205,14 +244,15 @@ The path is wrong or the page is not served by a web server. The error lists the
 The sketch's options need a variant or runtime that was not downloaded. Run the command shown in the error.
 
 **The CLI says it could not reach a host**
-Downloads need internet access to `tfhub.dev`, `www.kaggle.com` and `storage.googleapis.com` (TensorFlow.js files) and `cdn.jsdelivr.net` (MediaPipe files when ml5's dependencies are not installed). Behind a proxy, Node ignores `HTTPS_PROXY` by default; run the command with `NODE_USE_ENV_PROXY=1` (supported by recent Node 22 and Node 24 releases).
+Downloads need internet access to `tfhub.dev`, `www.kaggle.com`, `storage.googleapis.com` and `raw.githubusercontent.com` (TensorFlow.js files) and `cdn.jsdelivr.net` (MediaPipe files when ml5's dependencies are not installed). Behind a proxy, Node ignores `HTTPS_PROXY` by default; run the command with `NODE_USE_ENV_PROXY=1` (supported by recent Node 22 and Node 24 releases).
 
 **The page is blank offline**
 `index.html` still loads p5.js or ml5.js from a CDN. See [What "offline" needs](#what-offline-needs).
 
 ## Known limitations
 
-- `modelPath` covers handPose, faceMesh, bodyPose and objectDetection. Other ml5 models still load from the internet.
+- `modelPath` covers the TensorFlow.js models listed under [Models](#models). The models that run on Transformers.js still load from the internet: speechToText, depthEstimation's default `"DepthAnything"`, and imageClassifier's `"ViTBase"` and `"SwinFood101"`.
+- neuralNetwork, and Teachable Machine models given to imageClassifier or soundClassifier by URL, are your own files. Put them in your project folder and give ml5 their `http://localhost...` address; there is nothing for `prefetch` to download.
 - Do not open sketches with `file://`; use a local web server.
 - Strict Content Security Policy rules can block MediaPipe's script loading.
 - The p5.js Web Editor needs the internet itself. Download the sketch and follow [Moving a Web Editor sketch offline](./offline-from-web-editor.md).
