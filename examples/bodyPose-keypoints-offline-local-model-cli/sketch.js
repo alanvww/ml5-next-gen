@@ -1,24 +1,26 @@
-// BodyPose keypoints — offline local model CLI version.
-//
-// Setup once before running this sketch:
-//   node ../../bin/ml5.js cache prefetch bodypose
-// Once published to npm, this becomes: npx ml5 cache prefetch bodypose
-//
-// The CLI saves files into ./ml5-models/bodypose/. Point modelPath at that
-// model root, not at the tfjs/ or mediapipe/ runtime subfolder.
+/*
+ * 👋 Hello! This is an ml5.js example made and shared with ❤️.
+ * Learn more about the ml5.js project: https://ml5js.org/
+ * ml5.js license and Code of Conduct: https://github.com/ml5js/ml5-next-gen/blob/main/LICENSE.md
+ *
+ * This example demonstrates pose tracking on live video through ml5.bodyPose,
+ * with the model files loaded from a local folder instead of the internet.
+ *
+ * Before running it, download the model files and p5.js once.
+ * INSTRUCTIONS.md in this folder has the steps.
+ */
 
 let video;
 let bodyPose;
 let poses = [];
 
-function preload() {
-  // Load the BodyPose MoveNet model from local files. For local BlazePose TFJS,
-  // use: ml5.bodyPose({ modelName: "BlazePose", modelPath: "./ml5-models/bodypose" })
-  bodyPose = ml5.bodyPose({ modelPath: "./ml5-models/bodypose" });
-}
-
-function setup() {
+async function setup() {
   createCanvas(640, 480);
+
+  // Load the bodyPose model (MoveNet) from the local ml5-models folder.
+  // modelPath is relative to index.html. For BlazePose, use:
+  // ml5.bodyPose("BlazePose", { modelPath: "./ml5-models/bodypose" })
+  bodyPose = await ml5.bodyPose({ modelPath: "./ml5-models/bodypose" });
 
   // Create the video and hide it
   video = createCapture(VIDEO);
@@ -27,7 +29,6 @@ function setup() {
 
   // Start detecting poses in the webcam video
   bodyPose.detectStart(video, gotPoses);
-  console.log("BodyPose (MoveNet) model loaded from local files.");
 }
 
 function draw() {

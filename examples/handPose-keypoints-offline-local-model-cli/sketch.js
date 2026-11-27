@@ -1,33 +1,44 @@
-// HandPose keypoints — offline local model CLI version.
-//
-// Setup once before running this sketch:
-//   node ../../bin/ml5.js cache prefetch handpose
-// Once published to npm, this becomes: npx ml5 cache prefetch handpose
-//
-// The CLI saves files into ./ml5-models/handpose/. Point modelPath at that
-// model root, not at the tfjs/ or mediapipe/ runtime subfolder.
+/*
+ * 👋 Hello! This is an ml5.js example made and shared with ❤️.
+ * Learn more about the ml5.js project: https://ml5js.org/
+ * ml5.js license and Code of Conduct: https://github.com/ml5js/ml5-next-gen/blob/main/LICENSE.md
+ *
+ * This example demonstrates hand tracking on live video through ml5.handPose,
+ * with the model files loaded from a local folder instead of the internet.
+ *
+ * Before running it, download the model files and p5.js once.
+ * INSTRUCTIONS.md in this folder has the steps.
+ */
 
 let handPose;
 let video;
 let hands = [];
 
-function preload() {
-  handPose = ml5.handPose({ modelPath: "./ml5-models/handpose" });
-}
-
-function setup() {
+async function setup() {
   createCanvas(640, 480);
+
+  // Load the handPose model from the local ml5-models folder.
+  // modelPath is relative to index.html.
+  handPose = await ml5.handPose({ modelPath: "./ml5-models/handpose" });
+
+  // Create the webcam video and hide it
   video = createCapture(VIDEO);
   video.size(640, 480);
   video.hide();
+
+  // start detecting hands from the webcam video
   handPose.detectStart(video, gotHands);
-  console.log("HandPose model loaded from local files.");
 }
 
 function draw() {
+  // Draw the webcam video
   image(video, 0, 0, width, height);
-  for (let hand of hands) {
-    for (let keypoint of hand.keypoints) {
+
+  // Draw all the tracked hand points
+  for (let i = 0; i < hands.length; i++) {
+    let hand = hands[i];
+    for (let j = 0; j < hand.keypoints.length; j++) {
+      let keypoint = hand.keypoints[j];
       fill(0, 255, 0);
       noStroke();
       circle(keypoint.x, keypoint.y, 10);
@@ -35,6 +46,8 @@ function draw() {
   }
 }
 
+// Callback function for when handPose outputs data
 function gotHands(results) {
+  // save the output to the hands variable
   hands = results;
 }

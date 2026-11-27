@@ -1,31 +1,37 @@
-// FaceMesh keypoints — offline local model CLI version.
-//
-// Setup once before running this sketch:
-//   node ../../bin/ml5.js cache prefetch facemesh
-// Once published to npm, this becomes: npx ml5 cache prefetch facemesh
-//
-// The CLI saves files into ./ml5-models/facemesh/. Point modelPath at that
-// model root, not at the tfjs/ or mediapipe/ runtime subfolder.
+/*
+ * 👋 Hello! This is an ml5.js example made and shared with ❤️.
+ * Learn more about the ml5.js project: https://ml5js.org/
+ * ml5.js license and Code of Conduct: https://github.com/ml5js/ml5-next-gen/blob/main/LICENSE.md
+ *
+ * This example demonstrates face tracking on live video through ml5.faceMesh,
+ * with the model files loaded from a local folder instead of the internet.
+ *
+ * Before running it, download the model files and p5.js once.
+ * INSTRUCTIONS.md in this folder has the steps.
+ */
 
 let faceMesh;
 let video;
 let faces = [];
 let options = { maxFaces: 1, refineLandmarks: false, flipHorizontal: false };
 
-function preload() {
-  // Load the faceMesh model from local files
-  faceMesh = ml5.faceMesh({ ...options, modelPath: "./ml5-models/facemesh" });
-}
-
-function setup() {
+async function setup() {
   createCanvas(640, 480);
+
+  // Load the faceMesh model from the local ml5-models folder.
+  // modelPath is relative to index.html.
+  faceMesh = await ml5.faceMesh({
+    ...options,
+    modelPath: "./ml5-models/facemesh",
+  });
+
   // Create the webcam video and hide it
   video = createCapture(VIDEO);
   video.size(640, 480);
   video.hide();
+
   // Start detecting faces from the webcam video
   faceMesh.detectStart(video, gotFaces);
-  console.log("FaceMesh model loaded from local files.");
 }
 
 function draw() {
