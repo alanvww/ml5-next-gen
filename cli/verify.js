@@ -1,29 +1,51 @@
 /**
  * cli/verify.js
  *
- * Implements `ml5 cache verify <model> [--out <dir>]` by reading the model's
- * manifest, recomputing size + SHA-256 for each recorded file, and setting a
- * non-zero exit code if any file is missing or changed.
+ * Implements `ml5 cache verify [model...] [--out <dir>]` by reading each
+ * model's manifest, recomputing size + SHA-256 for each recorded file, and
+ * setting a non-zero exit code if any file is missing or changed. With no
+ * model names it verifies every cached model.
  */
 
 const path = require("node:path");
+const { findCachedModels } = require("./list");
+const { parseArgs } = require("./utils/args");
 const { resolveOutDir } = require("./utils/paths");
-const { readManifest, verifyManifest } = require("./utils/manifest");
+const {
+  readManifest,
+  isMl5Manifest,
+  verifyManifest,
+} = require("./utils/manifest");
 
 async function verify(args) {
-  const outIndex = args.indexOf("--out");
-  const out = resolveOutDir(outIndex >= 0 ? args[outIndex + 1] : "ml5-models");
-  // TODO: Replace this lightweight positional parsing with a shared parser.
-  // It matches clear.js for now, but a real parser would avoid surprising
-  // behavior when flags and model names are interleaved unusually.
-  const model = args.find((arg) => !arg.startsWith("--") && arg !== (outIndex >= 0 ? args[outIndex + 1] : undefined));
-  if (!model) throw new Error("Usage: ml5 cache verify <model>");
-  const root = path.join(out, model.toLowerCase());
-  const manifest = await readManifest(root);
-  if (!manifest) throw new Error(`No manifest found for ${model}`);
-  const results = await verifyManifest(root, manifest);
-  results.forEach((result) => console.log(`${result.ok ? "✓" : "✗"} ${result.path}`));
-  if (results.some((result) => !result.ok)) process.exitCode = 1;
+  const { options, positionals } = parseArgs(args, { values: ["out"] });
+  const out = resolveOutDir(options.out);
+  const names =
+    positionals.length > 0
+      ? positionals.map((name) => name.toLowerCase())
+      : (await findCachedModels(out)).map((item) => item.name);
+  if (names.length === 0)
+    throw new Error(`No local ml5 model files found in ${out}.`);
+  for (const name of names) {
+    const root = path.join(out, name);
+    const manifest = await readManifest(root);
+    if (!isMl5Manifest(manifest))
+      throw new Error(`No manifest found for ${name} in ${out}.`);
+    const results = await verifyManifest(root, manifest);
+    const failed = results.filter((result) => !result.ok);
+    console.log(
+      `${failed.length === 0 ? "✓" : "✗"} ${name}: ${
+        results.length - failed.length
+      }/${results.length} files match the manifest`
+    );
+    failed.forEach((result) =>
+      console.log(`    ✗ ${result.path} is missing or changed`)
+    );
+    if (failed.length > 0) {
+      console.log(`    Repair with: ml5 cache prefetch ${name} --force`);
+      process.exitCode = 1;
+    }
+  }
 }
 
 module.exports = { verify };

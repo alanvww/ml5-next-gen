@@ -1,24 +1,44 @@
 /**
  * cli/clear.js
  *
- * Implements `ml5 cache clear [model] [--out <dir>]` by removing either one
- * cached model directory or the entire cache output directory.
+ * Implements `ml5 cache clear [model...] [--out <dir>]`.
+ *
+ * Only folders that contain an ml5 manifest are removed, so a mistyped
+ * `--out` (for example `--out .`) cannot delete unrelated project files.
  */
 
 const fs = require("node:fs/promises");
 const path = require("node:path");
+const { findCachedModels } = require("./list");
+const { parseArgs } = require("./utils/args");
 const { resolveOutDir } = require("./utils/paths");
 
 async function clear(args) {
-  const outIndex = args.indexOf("--out");
-  const out = resolveOutDir(outIndex >= 0 ? args[outIndex + 1] : "ml5-models");
-  // TODO: Replace this lightweight positional parsing with a shared parser.
-  // Today `--out foo handpose` works, but unusual flag ordering can be
-  // surprising because we only skip the value immediately following --out.
-  const model = args.find((arg) => !arg.startsWith("--") && arg !== (outIndex >= 0 ? args[outIndex + 1] : undefined));
-  const target = model ? path.join(out, model.toLowerCase()) : out;
-  await fs.rm(target, { recursive: true, force: true });
-  console.log(`Cleared ${target}`);
+  const { options, positionals } = parseArgs(args, { values: ["out"] });
+  const out = resolveOutDir(options.out);
+  const cached = (await findCachedModels(out)).map((item) => item.name);
+  const names =
+    positionals.length > 0
+      ? positionals.map((name) => name.toLowerCase())
+      : cached;
+  if (names.length === 0) {
+    console.log(`No local ml5 model files found in ${out}.`);
+    return;
+  }
+  for (const name of names) {
+    if (!cached.includes(name)) {
+      console.log(
+        `Skipped ${name}: no ml5 model folder with that name in ${out}.`
+      );
+      continue;
+    }
+    await fs.rm(path.join(out, name), { recursive: true, force: true });
+    console.log(`Cleared ${path.join(out, name)}`);
+  }
+  // Remove the cache folder itself once nothing is left in it.
+  try {
+    if ((await fs.readdir(out)).length === 0) await fs.rmdir(out);
+  } catch (error) {}
 }
 
 module.exports = { clear };

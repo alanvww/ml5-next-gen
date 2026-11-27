@@ -1,108 +1,260 @@
 /**
  * cli/prefetch.js
  *
- * Implements `ml5 cache prefetch <model>...`.
+ * Implements `ml5 cache prefetch [model...]`.
  *
  * Per model, this:
- *   1. Optionally prompts before staging large downloads.
- *   2. Copies MediaPipe assets from node_modules into <out>/<model>/mediapipe/.
- *   3. Downloads TFJS model.json + weight shards into <out>/<model>/tfjs/<sub>/.
- *   4. Writes <out>/<model>/manifest.json with SHA-256 + size for every file.
+ *   1. Works out which variants and runtimes to stage (flags, or the
+ *      interactive picker when no model is named).
+ *   2. Downloads TFJS model.json + weight shards into <out>/<model>/tfjs/.
+ *   3. Copies or downloads MediaPipe assets into <out>/<model>/mediapipe/.
+ *   4. Writes <out>/<model>/manifest.json listing the staged runtimes,
+ *      variants, and a size + SHA-256 record for every file.
  *
- * The manifest is the contract that resolveModelUrls() probes when a sketch
- * sets `modelPath: "auto"` or points `modelPath` at a local model root.
+ * Running prefetch again adds to what is already there: variants and
+ * runtimes from earlier runs stay in the folder and in the manifest.
  */
 
-const fs = require("node:fs/promises");
 const path = require("node:path");
-const pkg = require("../package.json");
 const readline = require("node:readline/promises");
-const { copyMediaPipe } = require("./utils/copy-mediapipe");
+const pkg = require("../package.json");
+const { runPicker } = require("./picker");
+const {
+  RUNTIMES,
+  listModels,
+  getModel,
+  resolveVariants,
+  variantSupports,
+  getTfjsParts,
+  getMediaPipeFiles,
+  getCoveredVariants,
+} = require("./registry");
+const { parseArgs, splitList } = require("./utils/args");
 const { downloadTfjsModel } = require("./utils/download-tfjs");
-const { writeManifest } = require("./utils/manifest");
-const { modelRoot, runtimeDir } = require("./utils/paths");
+const {
+  MANIFEST_SCHEMA,
+  readManifest,
+  isCurrentManifest,
+  writeManifest,
+  describeFiles,
+  manifestSize,
+} = require("./utils/manifest");
+const { modelRoot, toSketchPath } = require("./utils/paths");
 const { log } = require("./utils/progress");
-const { getModelDirName, tfjsModels } = require("./registry");
+const { formatBytes } = require("./utils/size");
+const { stageMediaPipe } = require("./utils/stage-mediapipe");
 
-async function confirmLargeDownload(options) {
-  // The default `both` runtime can stage >30 MB. In CI/non-TTY contexts, fail
-  // fast unless the caller explicitly opts in with --yes.
-  if (options.yes || options.quiet || options.runtime !== "both") return;
-  if (!process.stdin.isTTY) {
-    throw new Error("This prefetch may download/copy more than 30 MB. Re-run with --yes to continue in a non-interactive shell.");
-  }
-  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-  const answer = await rl.question("This may stage more than 30 MB of model files. Continue? [y/N] ");
-  rl.close();
-  if (!/^y(es)?$/i.test(answer.trim())) throw new Error("Prefetch cancelled.");
+const USAGE =
+  "Usage: ml5 cache prefetch [model...] [--all] [--runtime tfjs|mediapipe|both] [--variant <name>[,<name>]|all] [--out <dir>] [--force]";
+
+const SKETCH_FUNCTIONS = {
+  handpose: "handPose",
+  facemesh: "faceMesh",
+  bodypose: "bodyPose",
+};
+
+function union(a, b) {
+  return [...new Set([...a, ...b])];
 }
 
-function parseOptions(args) {
-  const options = { models: [], out: "ml5-models", runtime: "both", variant: undefined, force: false, yes: false, quiet: false };
-  for (let i = 0; i < args.length; i += 1) {
-    const arg = args[i];
-    if (arg === "--out") options.out = args[++i];
-    else if (arg === "--runtime") options.runtime = args[++i];
-    else if (arg === "--variant") options.variant = args[++i];
-    else if (arg === "--force") options.force = true;
-    else if (arg === "--yes") options.yes = true;
-    else if (arg === "--quiet") options.quiet = true;
-    // Positional arguments are model names; normalize to registry keys.
-    else options.models.push(arg.toLowerCase());
+async function selectWithPicker() {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+  try {
+    return await runPicker((question) => rl.question(question));
+  } finally {
+    rl.close();
   }
-  return options;
+}
+
+/** Turns argv into a list of { model, variants } jobs plus shared options. */
+async function planJobs(args) {
+  const { options, positionals } = parseArgs(args, {
+    values: ["out", "runtime", "variant"],
+    booleans: ["all", "force", "yes", "quiet"],
+  });
+  const runtime = (options.runtime || "tfjs").toLowerCase();
+  if (!["tfjs", "mediapipe", "both"].includes(runtime))
+    throw new Error("--runtime must be tfjs, mediapipe, or both");
+  const shared = {
+    out: options.out,
+    force: Boolean(options.force),
+    quiet: Boolean(options.quiet),
+  };
+
+  const names = options.all ? listModels() : positionals;
+  if (names.length > 0) {
+    const requested = splitList(options.variant);
+    const jobs = names.map((name) => {
+      const model = getModel(name);
+      return { model, variants: resolveVariants(model, requested) };
+    });
+    return { ...shared, runtime, jobs };
+  }
+
+  if (!process.stdin.isTTY) {
+    throw new Error(
+      `${USAGE}\n\nName at least one model (${listModels().join(
+        ", "
+      )}) or pass --all.`
+    );
+  }
+  const picked = await selectWithPicker();
+  if (!picked) return { ...shared, runtime, jobs: [] };
+  const jobs = picked.models.map((name) => ({
+    model: getModel(name),
+    variants: picked.variants[name],
+  }));
+  return { ...shared, runtime: picked.runtime, jobs };
+}
+
+async function stageTfjs({ model, variants, root, force, quiet }) {
+  const parts = getTfjsParts(model, variants);
+  const sources = {};
+  const files = [];
+  for (const part of parts) {
+    log(`    ${part.path}`, quiet);
+    const names = await downloadTfjsModel({
+      url: part.url,
+      destination: path.join(root, ...part.path.split("/")),
+      force,
+    });
+    sources[part.path] = part.url;
+    files.push(...names.map((name) => `${part.path}/${name}`));
+  }
+  return {
+    variants: getCoveredVariants(model, variants, "tfjs"),
+    sources,
+    files: await describeFiles(root, files),
+  };
+}
+
+async function stageMediaPipeRuntime({ model, variants, root, force }) {
+  const files = getMediaPipeFiles(model, variants);
+  const staged = await stageMediaPipe({
+    mediapipe: model.mediapipe,
+    files,
+    destination: path.join(root, "mediapipe"),
+    force,
+  });
+  return {
+    ...staged,
+    variants: getCoveredVariants(model, variants, "mediapipe"),
+    files: await describeFiles(
+      root,
+      files.map((file) => `mediapipe/${file}`)
+    ),
+  };
+}
+
+async function prefetchModel({ model, variants, runtime, out, force, quiet }) {
+  const root = modelRoot(out, model.dir);
+  const previous = await readManifest(root);
+  const runtimes = isCurrentManifest(previous) ? { ...previous.runtimes } : {};
+  const wanted = runtime === "both" ? RUNTIMES : [runtime];
+
+  log(`Fetching ${model.name} (${variants.join(", ")})…`, quiet);
+  let staged = 0;
+  for (const name of wanted) {
+    const supported = variants.filter((variant) =>
+      variantSupports(model, variant, name)
+    );
+    const skipped = variants.filter((variant) => !supported.includes(variant));
+    if (skipped.length > 0 && runtime !== "both") {
+      log(`  ! ${skipped.join(", ")} has no ${name} files; skipping.`, quiet);
+    }
+    if (supported.length === 0) continue;
+    // Keep variants staged by earlier runs so the manifest stays complete.
+    const all = union(
+      (runtimes[name] && runtimes[name].variants) || [],
+      supported
+    );
+    if (name === "tfjs") {
+      log("  → downloading TensorFlow.js files", quiet);
+      runtimes.tfjs = await stageTfjs({
+        model,
+        variants: all,
+        root,
+        force,
+        quiet,
+      });
+    } else {
+      log("  → staging MediaPipe files", quiet);
+      runtimes.mediapipe = await stageMediaPipeRuntime({
+        model,
+        variants: all,
+        root,
+        force,
+      });
+      log(`    from ${runtimes.mediapipe.source}`, quiet);
+    }
+    staged += 1;
+  }
+  if (staged === 0) {
+    throw new Error(
+      `${model.name}: none of the requested variants (${variants.join(
+        ", "
+      )}) are available for --runtime ${runtime}.`
+    );
+  }
+
+  const manifest = {
+    $schema: MANIFEST_SCHEMA,
+    model: model.name,
+    createdAt: new Date().toISOString(),
+    ml5Version: pkg.version,
+    runtimes,
+  };
+  await writeManifest(root, manifest);
+  log(
+    `✓ ${model.name} ready at ${toSketchPath(root)} (${formatBytes(
+      manifestSize(manifest)
+    )})`,
+    quiet
+  );
+  return root;
 }
 
 async function prefetch(args) {
-  const options = parseOptions(args);
-  if (options.models.length === 0) throw new Error("Usage: ml5 cache prefetch <model>... [--runtime tfjs|mediapipe|both]");
-  if (!["tfjs", "mediapipe", "both"].includes(options.runtime)) throw new Error("--runtime must be tfjs, mediapipe, or both");
-
-  await confirmLargeDownload(options);
-
-  for (const model of options.models) {
-    const modelDirName = getModelDirName(model);
-    const root = modelRoot(options.out, modelDirName);
-    const manifest = { $schema: "ml5-models-manifest-v1", model, createdAt: new Date().toISOString(), ml5Version: pkg.version, runtimes: {} };
-
-    log(`Resolving ${model}…`, options.quiet);
-    if (options.runtime === "mediapipe" || options.runtime === "both") {
-      log(`  → staging MediaPipe assets`, options.quiet);
-      manifest.runtimes.mediapipe = await copyMediaPipe({
-        model,
-        variant: options.variant,
-        destination: runtimeDir(options.out, modelDirName, "mediapipe"),
-        force: options.force,
-      });
-    }
-
-    if (options.runtime === "tfjs" || options.runtime === "both") {
-      const models = tfjsModels[model];
-      if (!models) throw new Error(`Unknown model '${model}'`);
-      log(`  → downloading TFJS assets`, options.quiet);
-      manifest.runtimes.tfjs = { files: [], sources: {} };
-      for (const key of Object.keys(models)) {
-        // The generic `model` key is still staged in a `model/` subfolder so
-        // every TFJS entry has a stable runtime-local path.
-        const subdir = key === "model" ? "model" : key;
-        const result = await downloadTfjsModel({
-          name: key,
-          url: models[key],
-          destination: path.join(runtimeDir(options.out, modelDirName, "tfjs"), subdir),
-          manifestPrefix: path.posix.join("tfjs", subdir),
-          force: options.force,
-        });
-        manifest.runtimes.tfjs.sources[key] = result.source;
-        manifest.runtimes.tfjs.files.push(...result.files);
-      }
-    }
-
-    // writeManifest() also creates the root; this mkdir keeps the intent local
-    // to prefetch and makes the final manifest write obviously safe.
-    await fs.mkdir(root, { recursive: true });
-    await writeManifest(root, manifest);
-    log(`✓ ${model} ready at ${root}`, options.quiet);
+  const plan = await planJobs(args);
+  if (plan.jobs.length === 0) {
+    log("Nothing selected.", plan.quiet);
+    return;
   }
+  const roots = [];
+  for (const job of plan.jobs) {
+    roots.push({
+      model: job.model,
+      root: await prefetchModel({
+        ...job,
+        runtime: plan.runtime,
+        out: plan.out,
+        force: plan.force,
+        quiet: plan.quiet,
+      }),
+    });
+  }
+  log(
+    "\nUse the files in your sketch with the modelPath option, for example:",
+    plan.quiet
+  );
+  for (const { model, root } of roots) {
+    // modelPath is a URL relative to index.html. When the files were written
+    // outside the current folder we cannot know that URL, so show the
+    // conventional one.
+    const sketchPath = toSketchPath(root);
+    const shown = path.isAbsolute(sketchPath)
+      ? `./ml5-models/${model.dir}`
+      : sketchPath;
+    const fn = SKETCH_FUNCTIONS[model.name] || model.name;
+    log(`  ml5.${fn}({ modelPath: "${shown}" });`, plan.quiet);
+  }
+  log(
+    "modelPath is relative to your index.html. See docs/offline-mode.md for the rest of the offline setup.",
+    plan.quiet
+  );
 }
 
-module.exports = { prefetch };
+module.exports = { prefetch, planJobs, USAGE };
