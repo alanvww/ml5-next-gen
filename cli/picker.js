@@ -50,7 +50,7 @@ async function runPicker(ask) {
   const names = listModels();
   console.log("Which models do you want to use offline?\n");
   names.forEach((name, index) => {
-    console.log(`  ${index + 1}) ${name.padEnd(10)} ${getModel(name).label}`);
+    console.log(`  ${index + 1}) ${name.padEnd(17)} ${getModel(name).label}`);
   });
   const models = await askUntilValid(
     ask,
@@ -100,7 +100,7 @@ async function runPicker(ask) {
     available.forEach((variant, index) => {
       const mark = defaults.includes(variant) ? " (default)" : "";
       console.log(
-        `  ${index + 1}) ${variant.padEnd(30)} ${
+        `  ${index + 1}) ${variant.padEnd(38)} ${
           model.variants[variant].description
         }${mark}`
       );

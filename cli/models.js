@@ -22,7 +22,7 @@ async function models() {
       ).join(", ");
       const mark = model.defaultVariants.includes(variant) ? "*" : " ";
       console.log(
-        `  ${mark} ${variant.padEnd(30)} ${runtimes.padEnd(16)} ${
+        `  ${mark} ${variant.padEnd(38)} ${runtimes.padEnd(16)} ${
           model.variants[variant].description
         }`
       );

@@ -13,6 +13,9 @@ const KEY_LABELS = {
   modelUrl: "model",
   detectorModelUrl: "detector",
   landmarkModelUrl: "landmark",
+  featureVectorURL: "feature vector",
+  depthModelUrl: "depth",
+  segmentationModelUrl: "segmentation",
 };
 
 function render() {
@@ -25,7 +28,9 @@ function render() {
     "",
     "For a beginner-friendly walkthrough with manual download instructions, see [`manual-model-setup/where-to-download-models.md`](./manual-model-setup/where-to-download-models.md).",
     "",
-    "TensorFlow.js URLs are folders: append `/model.json?tfjs-format=file` to download the model file, and do the same for each weight file it lists.",
+    "TensorFlow.js sources are folders: append `/model.json` to download the model file, then download each weight file it lists from the same folder. For `tfhub.dev` and `kaggle.com` sources, also add `?tfjs-format=file` to the end of every file URL.",
+    "",
+    "A source that ends in `.json` is the model file itself. Save it as `model.json`; its weight files are in the same remote folder.",
   ];
   for (const name of Object.keys(registry.models)) {
     const model = registry.models[name];
@@ -42,8 +47,12 @@ function render() {
       const parts = model.variants[variant].tfjs || {};
       const mark = model.defaultVariants.includes(variant) ? " (default)" : "";
       for (const key of Object.keys(parts)) {
+        // Files such as metadata.json sit next to model.json, remotely and locally.
+        const extra = (parts[key].extraFiles || [])
+          .map((file) => `, plus \`${file}\``)
+          .join("");
         lines.push(
-          `| \`${variant}\`${mark} | ${KEY_LABELS[key] || key} | \`${
+          `| \`${variant}\`${mark} | ${KEY_LABELS[key] || key}${extra} | \`${
             parts[key].path
           }/\` | ${parts[key].url} |`
         );

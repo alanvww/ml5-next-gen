@@ -238,6 +238,504 @@
           }
         }
       }
+    },
+    "bodysegmentation": {
+      "label": "BodySegmentation",
+      "function": "bodySegmentation",
+      "dir": "bodysegmentation",
+      "defaultVariants": ["selfie"],
+      "aliases": {
+        "general": "selfie",
+        "landscape": "selfie-landscape",
+        "bodypix-resnet50-stride16-quant2": "bodypix"
+      },
+      "variants": {
+        "selfie": {
+          "description": "SelfieSegmentation, the bodySegmentation default (modelType: \"general\")",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model",
+              "url": "https://tfhub.dev/mediapipe/tfjs-model/selfie_segmentation/general/1"
+            }
+          },
+          "mediapipe": ["selfie_segmentation.tflite"]
+        },
+        "selfie-landscape": {
+          "description": "SelfieSegmentation (modelType: \"landscape\")",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-landscape",
+              "url": "https://tfhub.dev/mediapipe/tfjs-model/selfie_segmentation/landscape/1"
+            }
+          },
+          "mediapipe": ["selfie_segmentation_landscape.tflite"]
+        },
+        "bodypix": {
+          "description": "BodyPix default (ResNet50, outputStride 16, quantBytes 2)",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-bodypix",
+              "url": "https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/resnet50/quant2/model-stride16.json"
+            }
+          }
+        },
+        "bodypix-resnet50-stride16-quant1": {
+          "description": "BodyPix (ResNet50, outputStride 16, quantBytes 1)",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-bodypix-resnet50-stride16-quant1",
+              "url": "https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/resnet50/quant1/model-stride16.json"
+            }
+          }
+        },
+        "bodypix-resnet50-stride16-quant4": {
+          "description": "BodyPix (ResNet50, outputStride 16, quantBytes 4)",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-bodypix-resnet50-stride16-quant4",
+              "url": "https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/resnet50/float/model-stride16.json"
+            }
+          }
+        },
+        "bodypix-resnet50-stride32-quant2": {
+          "description": "BodyPix (ResNet50, outputStride 32, quantBytes 2)",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-bodypix-resnet50-stride32-quant2",
+              "url": "https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/resnet50/quant2/model-stride32.json"
+            }
+          }
+        },
+        "bodypix-resnet50-stride32-quant1": {
+          "description": "BodyPix (ResNet50, outputStride 32, quantBytes 1)",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-bodypix-resnet50-stride32-quant1",
+              "url": "https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/resnet50/quant1/model-stride32.json"
+            }
+          }
+        },
+        "bodypix-resnet50-stride32-quant4": {
+          "description": "BodyPix (ResNet50, outputStride 32, quantBytes 4)",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-bodypix-resnet50-stride32-quant4",
+              "url": "https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/resnet50/float/model-stride32.json"
+            }
+          }
+        },
+        "bodypix-mobilenet100-stride16-quant2": {
+          "description": "BodyPix (MobileNetV1, multiplier 1, outputStride 16, quantBytes 2)",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-bodypix-mobilenet100-stride16-quant2",
+              "url": "https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/quant2/100/model-stride16.json"
+            }
+          }
+        },
+        "bodypix-mobilenet100-stride16-quant1": {
+          "description": "BodyPix (MobileNetV1, multiplier 1, outputStride 16, quantBytes 1)",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-bodypix-mobilenet100-stride16-quant1",
+              "url": "https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/quant1/100/model-stride16.json"
+            }
+          }
+        },
+        "bodypix-mobilenet100-stride16-quant4": {
+          "description": "BodyPix (MobileNetV1, multiplier 1, outputStride 16, quantBytes 4)",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-bodypix-mobilenet100-stride16-quant4",
+              "url": "https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/float/100/model-stride16.json"
+            }
+          }
+        },
+        "bodypix-mobilenet100-stride8-quant2": {
+          "description": "BodyPix (MobileNetV1, multiplier 1, outputStride 8, quantBytes 2)",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-bodypix-mobilenet100-stride8-quant2",
+              "url": "https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/quant2/100/model-stride8.json"
+            }
+          }
+        },
+        "bodypix-mobilenet100-stride8-quant1": {
+          "description": "BodyPix (MobileNetV1, multiplier 1, outputStride 8, quantBytes 1)",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-bodypix-mobilenet100-stride8-quant1",
+              "url": "https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/quant1/100/model-stride8.json"
+            }
+          }
+        },
+        "bodypix-mobilenet100-stride8-quant4": {
+          "description": "BodyPix (MobileNetV1, multiplier 1, outputStride 8, quantBytes 4)",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-bodypix-mobilenet100-stride8-quant4",
+              "url": "https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/float/100/model-stride8.json"
+            }
+          }
+        },
+        "bodypix-mobilenet075-stride16-quant2": {
+          "description": "BodyPix (MobileNetV1, multiplier 0.75, outputStride 16, quantBytes 2)",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-bodypix-mobilenet075-stride16-quant2",
+              "url": "https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/quant2/075/model-stride16.json"
+            }
+          }
+        },
+        "bodypix-mobilenet075-stride16-quant1": {
+          "description": "BodyPix (MobileNetV1, multiplier 0.75, outputStride 16, quantBytes 1)",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-bodypix-mobilenet075-stride16-quant1",
+              "url": "https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/quant1/075/model-stride16.json"
+            }
+          }
+        },
+        "bodypix-mobilenet075-stride16-quant4": {
+          "description": "BodyPix (MobileNetV1, multiplier 0.75, outputStride 16, quantBytes 4)",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-bodypix-mobilenet075-stride16-quant4",
+              "url": "https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/float/075/model-stride16.json"
+            }
+          }
+        },
+        "bodypix-mobilenet075-stride8-quant2": {
+          "description": "BodyPix (MobileNetV1, multiplier 0.75, outputStride 8, quantBytes 2)",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-bodypix-mobilenet075-stride8-quant2",
+              "url": "https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/quant2/075/model-stride8.json"
+            }
+          }
+        },
+        "bodypix-mobilenet075-stride8-quant1": {
+          "description": "BodyPix (MobileNetV1, multiplier 0.75, outputStride 8, quantBytes 1)",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-bodypix-mobilenet075-stride8-quant1",
+              "url": "https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/quant1/075/model-stride8.json"
+            }
+          }
+        },
+        "bodypix-mobilenet075-stride8-quant4": {
+          "description": "BodyPix (MobileNetV1, multiplier 0.75, outputStride 8, quantBytes 4)",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-bodypix-mobilenet075-stride8-quant4",
+              "url": "https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/float/075/model-stride8.json"
+            }
+          }
+        },
+        "bodypix-mobilenet050-stride16-quant2": {
+          "description": "BodyPix (MobileNetV1, multiplier 0.5, outputStride 16, quantBytes 2)",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-bodypix-mobilenet050-stride16-quant2",
+              "url": "https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/quant2/050/model-stride16.json"
+            }
+          }
+        },
+        "bodypix-mobilenet050-stride16-quant1": {
+          "description": "BodyPix (MobileNetV1, multiplier 0.5, outputStride 16, quantBytes 1)",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-bodypix-mobilenet050-stride16-quant1",
+              "url": "https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/quant1/050/model-stride16.json"
+            }
+          }
+        },
+        "bodypix-mobilenet050-stride16-quant4": {
+          "description": "BodyPix (MobileNetV1, multiplier 0.5, outputStride 16, quantBytes 4)",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-bodypix-mobilenet050-stride16-quant4",
+              "url": "https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/float/050/model-stride16.json"
+            }
+          }
+        },
+        "bodypix-mobilenet050-stride8-quant2": {
+          "description": "BodyPix (MobileNetV1, multiplier 0.5, outputStride 8, quantBytes 2)",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-bodypix-mobilenet050-stride8-quant2",
+              "url": "https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/quant2/050/model-stride8.json"
+            }
+          }
+        },
+        "bodypix-mobilenet050-stride8-quant1": {
+          "description": "BodyPix (MobileNetV1, multiplier 0.5, outputStride 8, quantBytes 1)",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-bodypix-mobilenet050-stride8-quant1",
+              "url": "https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/quant1/050/model-stride8.json"
+            }
+          }
+        },
+        "bodypix-mobilenet050-stride8-quant4": {
+          "description": "BodyPix (MobileNetV1, multiplier 0.5, outputStride 8, quantBytes 4)",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-bodypix-mobilenet050-stride8-quant4",
+              "url": "https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/float/050/model-stride8.json"
+            }
+          }
+        }
+      },
+      "mediapipe": {
+        "package": "@mediapipe/selfie_segmentation",
+        "version": "0.1.1675465747",
+        "marker": "selfie_segmentation.binarypb",
+        "shared": [
+          "selfie_segmentation.binarypb",
+          "selfie_segmentation.js",
+          "selfie_segmentation_solution_simd_wasm_bin.js",
+          "selfie_segmentation_solution_simd_wasm_bin.wasm",
+          "selfie_segmentation_solution_simd_wasm_bin.data",
+          "selfie_segmentation_solution_wasm_bin.js",
+          "selfie_segmentation_solution_wasm_bin.wasm"
+        ]
+      }
+    },
+    "imageclassifier": {
+      "label": "ImageClassifier",
+      "function": "imageClassifier",
+      "dir": "imageclassifier",
+      "defaultVariants": ["mobilenet"],
+      "aliases": {
+        "mobilenet-v2-100": "mobilenet"
+      },
+      "variants": {
+        "mobilenet": {
+          "description": "MobileNet v2, the imageClassifier default",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model",
+              "url": "https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/2"
+            }
+          }
+        },
+        "mobilenet-v2-075": {
+          "description": "MobileNet (version: 2, alpha: 0.75)",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-mobilenet-v2-075",
+              "url": "https://tfhub.dev/google/imagenet/mobilenet_v2_075_224/classification/2"
+            }
+          }
+        },
+        "mobilenet-v2-050": {
+          "description": "MobileNet (version: 2, alpha: 0.5)",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-mobilenet-v2-050",
+              "url": "https://tfhub.dev/google/imagenet/mobilenet_v2_050_224/classification/2"
+            }
+          }
+        },
+        "mobilenet-v1-100": {
+          "description": "MobileNet (version: 1, alpha: 1)",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-mobilenet-v1-100",
+              "url": "https://tfhub.dev/google/imagenet/mobilenet_v1_100_224/classification/1"
+            }
+          }
+        },
+        "mobilenet-v1-075": {
+          "description": "MobileNet (version: 1, alpha: 0.75)",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-mobilenet-v1-075",
+              "url": "https://tfhub.dev/google/imagenet/mobilenet_v1_075_224/classification/1"
+            }
+          }
+        },
+        "mobilenet-v1-050": {
+          "description": "MobileNet (version: 1, alpha: 0.5)",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-mobilenet-v1-050",
+              "url": "https://tfhub.dev/google/imagenet/mobilenet_v1_050_224/classification/1"
+            }
+          }
+        },
+        "mobilenet-v1-025": {
+          "description": "MobileNet (version: 1, alpha: 0.25)",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-mobilenet-v1-025",
+              "url": "https://tfhub.dev/google/imagenet/mobilenet_v1_025_224/classification/1"
+            }
+          }
+        },
+        "darknet": {
+          "description": "Darknet reference (\"darknet\")",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-darknet",
+              "url": "https://raw.githubusercontent.com/ml5js/ml5-data-and-models/master/models/darknetclassifier/darknetreference"
+            }
+          }
+        },
+        "darknet-tiny": {
+          "description": "Darknet tiny (\"darknet-tiny\")",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-darknet-tiny",
+              "url": "https://raw.githubusercontent.com/ml5js/ml5-data-and-models/master/models/darknetclassifier/darknettiny"
+            }
+          }
+        },
+        "doodlenet": {
+          "description": "DoodleNet (\"doodlenet\")",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-doodlenet",
+              "url": "https://raw.githubusercontent.com/ml5js/ml5-data-and-models/master/models/doodlenet"
+            }
+          }
+        }
+      }
+    },
+    "featureextractor": {
+      "label": "FeatureExtractor",
+      "function": "featureExtractor",
+      "dir": "featureextractor",
+      "defaultVariants": ["mobilenet"],
+      "aliases": {
+        "mobilenet-v2-100": "mobilenet"
+      },
+      "variants": {
+        "mobilenet": {
+          "description": "MobileNet v2 feature vector, the featureExtractor default",
+          "tfjs": {
+            "featureVectorURL": {
+              "path": "tfjs/model",
+              "url": "https://www.kaggle.com/models/google/mobilenet-v2/TfJs/100-224-feature-vector/3"
+            }
+          }
+        },
+        "mobilenet-v2-075": {
+          "description": "MobileNet feature vector (version: 2, alpha: 0.75)",
+          "tfjs": {
+            "featureVectorURL": {
+              "path": "tfjs/model-mobilenet-v2-075",
+              "url": "https://www.kaggle.com/models/google/mobilenet-v2/TfJs/075-224-feature-vector/3"
+            }
+          }
+        },
+        "mobilenet-v2-050": {
+          "description": "MobileNet feature vector (version: 2, alpha: 0.5)",
+          "tfjs": {
+            "featureVectorURL": {
+              "path": "tfjs/model-mobilenet-v2-050",
+              "url": "https://www.kaggle.com/models/google/mobilenet-v2/TfJs/050-224-feature-vector/3"
+            }
+          }
+        },
+        "mobilenet-v1-100": {
+          "description": "MobileNet feature vector (version: 1, alpha: 1)",
+          "tfjs": {
+            "featureVectorURL": {
+              "path": "tfjs/model-mobilenet-v1-100",
+              "url": "https://www.kaggle.com/models/google/mobilenet-v1/TfJs/100-224-feature-vector/2"
+            }
+          }
+        },
+        "mobilenet-v1-075": {
+          "description": "MobileNet feature vector (version: 1, alpha: 0.75)",
+          "tfjs": {
+            "featureVectorURL": {
+              "path": "tfjs/model-mobilenet-v1-075",
+              "url": "https://www.kaggle.com/models/google/mobilenet-v1/TfJs/075-224-feature-vector/2"
+            }
+          }
+        },
+        "mobilenet-v1-050": {
+          "description": "MobileNet feature vector (version: 1, alpha: 0.5)",
+          "tfjs": {
+            "featureVectorURL": {
+              "path": "tfjs/model-mobilenet-v1-050",
+              "url": "https://www.kaggle.com/models/google/mobilenet-v1/TfJs/050-224-feature-vector/2"
+            }
+          }
+        },
+        "mobilenet-v1-025": {
+          "description": "MobileNet feature vector (version: 1, alpha: 0.25)",
+          "tfjs": {
+            "featureVectorURL": {
+              "path": "tfjs/model-mobilenet-v1-025",
+              "url": "https://www.kaggle.com/models/google/mobilenet-v1/TfJs/025-224-feature-vector/2"
+            }
+          }
+        }
+      }
+    },
+    "soundclassifier": {
+      "label": "SoundClassifier",
+      "function": "soundClassifier",
+      "modelName": "SpeechCommands18w",
+      "dir": "soundclassifier",
+      "defaultVariants": ["speechcommands18w"],
+      "variants": {
+        "speechcommands18w": {
+          "description": "SpeechCommands, 18 words",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model",
+              "url": "https://storage.googleapis.com/tfjs-models/tfjs/speech-commands/v0.5/browser_fft/18w",
+              "extraFiles": ["metadata.json"]
+            }
+          }
+        }
+      }
+    },
+    "sentiment": {
+      "label": "Sentiment",
+      "function": "sentiment",
+      "modelName": "MovieReviews",
+      "dir": "sentiment",
+      "defaultVariants": ["moviereviews"],
+      "variants": {
+        "moviereviews": {
+          "description": "MovieReviews, the sentiment default",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model",
+              "url": "https://storage.googleapis.com/tfjs-models/tfjs/sentiment_cnn_v1",
+              "extraFiles": ["metadata.json"]
+            }
+          }
+        }
+      }
+    },
+    "depthestimation": {
+      "label": "DepthEstimation",
+      "function": "depthEstimation",
+      "modelName": "ARPortraitDepth",
+      "dir": "depthestimation",
+      "defaultVariants": ["arportraitdepth"],
+      "variants": {
+        "arportraitdepth": {
+          "description": "ARPortraitDepth, with the SelfieSegmentation model it uses for masking",
+          "tfjs": {
+            "depthModelUrl": {
+              "path": "tfjs/depth",
+              "url": "https://tfhub.dev/tensorflow/tfjs-model/ar_portrait_depth/1"
+            },
+            "segmentationModelUrl": {
+              "path": "tfjs/segmentation",
+              "url": "https://tfhub.dev/mediapipe/tfjs-model/selfie_segmentation/general/1"
+            }
+          }
+        }
+      }
     }
   }
 }

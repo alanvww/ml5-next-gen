@@ -3,21 +3,30 @@
  *
  * Downloads a TFJS model.json file and every weight shard listed in its
  * weightsManifest. This lets the CLI avoid hardcoding shard filenames.
+ *
+ * The model file is always saved as `model.json`, also when the source uses
+ * another name (BodyPix has `model-stride16.json`).
  */
 
 const fs = require("node:fs/promises");
 const path = require("node:path");
 const { fetchWithRetry, downloadToFile, exists } = require("./fetch");
 
+// TF Hub and Kaggle model pages only return the files themselves when the
+// request carries `?tfjs-format=file`.
+function isHubUrl(url) {
+  return url.includes("tfhub.dev") || url.includes("kaggle.com/models/");
+}
+
 function toModelJsonUrl(url) {
-  if (url.includes("tfhub.dev")) return `${url.replace(/\/+$/, "")}/model.json?tfjs-format=file`;
-  return url.endsWith("model.json") ? url : `${url.replace(/\/+$/, "")}/model.json`;
+  if (isHubUrl(url)) return `${url.replace(/\/+$/, "")}/model.json?tfjs-format=file`;
+  return url.endsWith(".json") ? url : `${url.replace(/\/+$/, "")}/model.json`;
 }
 
 function dirnameUrl(url) {
-  // Strip `/model.json` and any query string so shard paths resolve beside the
-  // fetched model file.
-  return url.replace(/\/model\.json(?:\?.*)?$/, "").replace(/\/+$/, "");
+  // Strip the model file name and any query string so shard paths resolve
+  // beside the fetched model file.
+  return url.replace(/\/[^/]+\.json(?:\?.*)?$/, "").replace(/\/+$/, "");
 }
 
 function toShardUrl(base, shard) {
@@ -25,7 +34,7 @@ function toShardUrl(base, shard) {
   const url = `${base}/${shard}`;
   // tfhub.dev requires the same file-format query for shards as model.json;
   // omitting it can return an HTML redirect/403 instead of binary weights.
-  return base.includes("tfhub.dev") ? `${url}?tfjs-format=file` : url;
+  return isHubUrl(base) ? `${url}?tfjs-format=file` : url;
 }
 
 function shardPaths(model) {
@@ -37,10 +46,12 @@ function shardPaths(model) {
 }
 
 /**
+ * @param {string[]} [extraFiles] - Other files in the same remote folder
+ * that the model needs, such as `metadata.json`.
  * @returns {Promise<string[]>} File names (relative to `destination`) that
- * make up the model: model.json plus its weight shards.
+ * make up the model: model.json, its weight shards, and the extra files.
  */
-async function downloadTfjsModel({ url, destination, force = false }) {
+async function downloadTfjsModel({ url, destination, force = false, extraFiles = [] }) {
   const modelJsonUrl = toModelJsonUrl(url);
   const modelJsonPath = path.join(destination, "model.json");
   let modelJson;
@@ -66,10 +77,13 @@ async function downloadTfjsModel({ url, destination, force = false }) {
       { force }
     );
   }
+  for (const name of extraFiles) {
+    await downloadToFile(`${base}/${name}`, path.join(destination, name), { force });
+  }
   // model.json is written last so its presence means the shards are complete.
   await fs.mkdir(destination, { recursive: true });
   await fs.writeFile(modelJsonPath, modelJson);
-  return ["model.json", ...shards];
+  return ["model.json", ...shards, ...extraFiles];
 }
 
-module.exports = { downloadTfjsModel };
+module.exports = { downloadTfjsModel, toModelJsonUrl, dirnameUrl, toShardUrl };

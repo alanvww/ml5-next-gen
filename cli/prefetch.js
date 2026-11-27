@@ -120,6 +120,7 @@ async function stageTfjs({ model, variants, root, force, quiet }) {
       url: part.url,
       destination: path.join(root, ...part.path.split("/")),
       force,
+      extraFiles: part.extraFiles,
     });
     sources[part.path] = part.url;
     files.push(...names.map((name) => `${part.path}/${name}`));
@@ -258,7 +259,12 @@ async function prefetch(args) {
     const shown = path.isAbsolute(sketchPath)
       ? `./ml5-models/${model.dir}`
       : sketchPath;
-    log(`  ml5.${model.function}({ modelPath: "${shown}" });`, plan.quiet);
+    // Some functions need a model name before the options to pick this model.
+    const name = model.modelName ? `"${model.modelName}", ` : "";
+    log(
+      `  ml5.${model.function}(${name}{ modelPath: "${shown}" });`,
+      plan.quiet
+    );
   }
   log(
     "modelPath is relative to your index.html. See docs/offline-mode.md for the rest of the offline setup.",

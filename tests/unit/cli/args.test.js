@@ -70,7 +70,7 @@ describe("interactive picker", () => {
   test("re-asks after an invalid answer and honours explicit variants", async () => {
     // models (invalid, then valid), runtime, bodypose variants, confirm
     const result = await runPicker(
-      scripted(["9", "bodypose", "mediapipe", "2,3", "y"])
+      scripted(["99", "bodypose", "mediapipe", "2,3", "y"])
     );
     expect(result.runtime).toBe("mediapipe");
     // MoveNet has no MediaPipe files, so only BlazePose variants are offered.

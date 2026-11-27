@@ -6,7 +6,9 @@ Where `ml5 cache prefetch` downloads each model from, and the folder inside `ml5
 
 For a beginner-friendly walkthrough with manual download instructions, see [`manual-model-setup/where-to-download-models.md`](./manual-model-setup/where-to-download-models.md).
 
-TensorFlow.js URLs are folders: append `/model.json?tfjs-format=file` to download the model file, and do the same for each weight file it lists.
+TensorFlow.js sources are folders: append `/model.json` to download the model file, then download each weight file it lists from the same folder. For `tfhub.dev` and `kaggle.com` sources, also add `?tfjs-format=file` to the end of every file URL.
+
+A source that ends in `.json` is the model file itself. Save it as `model.json`; its weight files are in the same remote folder.
 
 ## HandPose (`handpose`)
 
@@ -114,3 +116,111 @@ Plus one file per variant:
 | `lite_mobilenet_v2` (default) | model | `tfjs/model/` | https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2 |
 | `mobilenet_v1` | model | `tfjs/model-mobilenet-v1/` | https://storage.googleapis.com/tfjs-models/savedmodel/ssd_mobilenet_v1 |
 | `mobilenet_v2` | model | `tfjs/model-mobilenet-v2/` | https://storage.googleapis.com/tfjs-models/savedmodel/ssd_mobilenet_v2 |
+
+## BodySegmentation (`bodysegmentation`)
+
+### TensorFlow.js
+
+| Variant | Part | Local folder | Source |
+| --- | --- | --- | --- |
+| `selfie` (default) | model | `tfjs/model/` | https://tfhub.dev/mediapipe/tfjs-model/selfie_segmentation/general/1 |
+| `selfie-landscape` | model | `tfjs/model-landscape/` | https://tfhub.dev/mediapipe/tfjs-model/selfie_segmentation/landscape/1 |
+| `bodypix` | model | `tfjs/model-bodypix/` | https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/resnet50/quant2/model-stride16.json |
+| `bodypix-resnet50-stride16-quant1` | model | `tfjs/model-bodypix-resnet50-stride16-quant1/` | https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/resnet50/quant1/model-stride16.json |
+| `bodypix-resnet50-stride16-quant4` | model | `tfjs/model-bodypix-resnet50-stride16-quant4/` | https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/resnet50/float/model-stride16.json |
+| `bodypix-resnet50-stride32-quant2` | model | `tfjs/model-bodypix-resnet50-stride32-quant2/` | https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/resnet50/quant2/model-stride32.json |
+| `bodypix-resnet50-stride32-quant1` | model | `tfjs/model-bodypix-resnet50-stride32-quant1/` | https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/resnet50/quant1/model-stride32.json |
+| `bodypix-resnet50-stride32-quant4` | model | `tfjs/model-bodypix-resnet50-stride32-quant4/` | https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/resnet50/float/model-stride32.json |
+| `bodypix-mobilenet100-stride16-quant2` | model | `tfjs/model-bodypix-mobilenet100-stride16-quant2/` | https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/quant2/100/model-stride16.json |
+| `bodypix-mobilenet100-stride16-quant1` | model | `tfjs/model-bodypix-mobilenet100-stride16-quant1/` | https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/quant1/100/model-stride16.json |
+| `bodypix-mobilenet100-stride16-quant4` | model | `tfjs/model-bodypix-mobilenet100-stride16-quant4/` | https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/float/100/model-stride16.json |
+| `bodypix-mobilenet100-stride8-quant2` | model | `tfjs/model-bodypix-mobilenet100-stride8-quant2/` | https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/quant2/100/model-stride8.json |
+| `bodypix-mobilenet100-stride8-quant1` | model | `tfjs/model-bodypix-mobilenet100-stride8-quant1/` | https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/quant1/100/model-stride8.json |
+| `bodypix-mobilenet100-stride8-quant4` | model | `tfjs/model-bodypix-mobilenet100-stride8-quant4/` | https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/float/100/model-stride8.json |
+| `bodypix-mobilenet075-stride16-quant2` | model | `tfjs/model-bodypix-mobilenet075-stride16-quant2/` | https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/quant2/075/model-stride16.json |
+| `bodypix-mobilenet075-stride16-quant1` | model | `tfjs/model-bodypix-mobilenet075-stride16-quant1/` | https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/quant1/075/model-stride16.json |
+| `bodypix-mobilenet075-stride16-quant4` | model | `tfjs/model-bodypix-mobilenet075-stride16-quant4/` | https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/float/075/model-stride16.json |
+| `bodypix-mobilenet075-stride8-quant2` | model | `tfjs/model-bodypix-mobilenet075-stride8-quant2/` | https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/quant2/075/model-stride8.json |
+| `bodypix-mobilenet075-stride8-quant1` | model | `tfjs/model-bodypix-mobilenet075-stride8-quant1/` | https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/quant1/075/model-stride8.json |
+| `bodypix-mobilenet075-stride8-quant4` | model | `tfjs/model-bodypix-mobilenet075-stride8-quant4/` | https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/float/075/model-stride8.json |
+| `bodypix-mobilenet050-stride16-quant2` | model | `tfjs/model-bodypix-mobilenet050-stride16-quant2/` | https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/quant2/050/model-stride16.json |
+| `bodypix-mobilenet050-stride16-quant1` | model | `tfjs/model-bodypix-mobilenet050-stride16-quant1/` | https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/quant1/050/model-stride16.json |
+| `bodypix-mobilenet050-stride16-quant4` | model | `tfjs/model-bodypix-mobilenet050-stride16-quant4/` | https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/float/050/model-stride16.json |
+| `bodypix-mobilenet050-stride8-quant2` | model | `tfjs/model-bodypix-mobilenet050-stride8-quant2/` | https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/quant2/050/model-stride8.json |
+| `bodypix-mobilenet050-stride8-quant1` | model | `tfjs/model-bodypix-mobilenet050-stride8-quant1/` | https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/quant1/050/model-stride8.json |
+| `bodypix-mobilenet050-stride8-quant4` | model | `tfjs/model-bodypix-mobilenet050-stride8-quant4/` | https://storage.googleapis.com/tfjs-models/savedmodel/bodypix/mobilenet/float/050/model-stride8.json |
+
+### MediaPipe
+
+Package `@mediapipe/selfie_segmentation@0.1.1675465747`. Files are saved to `mediapipe/` and are available at `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@0.1.1675465747/<file>`.
+
+Every variant needs:
+
+- `selfie_segmentation.binarypb`
+- `selfie_segmentation.js`
+- `selfie_segmentation_solution_simd_wasm_bin.js`
+- `selfie_segmentation_solution_simd_wasm_bin.wasm`
+- `selfie_segmentation_solution_simd_wasm_bin.data`
+- `selfie_segmentation_solution_wasm_bin.js`
+- `selfie_segmentation_solution_wasm_bin.wasm`
+
+Plus one file per variant:
+
+- `selfie`: `selfie_segmentation.tflite`
+- `selfie-landscape`: `selfie_segmentation_landscape.tflite`
+
+## ImageClassifier (`imageclassifier`)
+
+### TensorFlow.js
+
+| Variant | Part | Local folder | Source |
+| --- | --- | --- | --- |
+| `mobilenet` (default) | model | `tfjs/model/` | https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/2 |
+| `mobilenet-v2-075` | model | `tfjs/model-mobilenet-v2-075/` | https://tfhub.dev/google/imagenet/mobilenet_v2_075_224/classification/2 |
+| `mobilenet-v2-050` | model | `tfjs/model-mobilenet-v2-050/` | https://tfhub.dev/google/imagenet/mobilenet_v2_050_224/classification/2 |
+| `mobilenet-v1-100` | model | `tfjs/model-mobilenet-v1-100/` | https://tfhub.dev/google/imagenet/mobilenet_v1_100_224/classification/1 |
+| `mobilenet-v1-075` | model | `tfjs/model-mobilenet-v1-075/` | https://tfhub.dev/google/imagenet/mobilenet_v1_075_224/classification/1 |
+| `mobilenet-v1-050` | model | `tfjs/model-mobilenet-v1-050/` | https://tfhub.dev/google/imagenet/mobilenet_v1_050_224/classification/1 |
+| `mobilenet-v1-025` | model | `tfjs/model-mobilenet-v1-025/` | https://tfhub.dev/google/imagenet/mobilenet_v1_025_224/classification/1 |
+| `darknet` | model | `tfjs/model-darknet/` | https://raw.githubusercontent.com/ml5js/ml5-data-and-models/master/models/darknetclassifier/darknetreference |
+| `darknet-tiny` | model | `tfjs/model-darknet-tiny/` | https://raw.githubusercontent.com/ml5js/ml5-data-and-models/master/models/darknetclassifier/darknettiny |
+| `doodlenet` | model | `tfjs/model-doodlenet/` | https://raw.githubusercontent.com/ml5js/ml5-data-and-models/master/models/doodlenet |
+
+## FeatureExtractor (`featureextractor`)
+
+### TensorFlow.js
+
+| Variant | Part | Local folder | Source |
+| --- | --- | --- | --- |
+| `mobilenet` (default) | feature vector | `tfjs/model/` | https://www.kaggle.com/models/google/mobilenet-v2/TfJs/100-224-feature-vector/3 |
+| `mobilenet-v2-075` | feature vector | `tfjs/model-mobilenet-v2-075/` | https://www.kaggle.com/models/google/mobilenet-v2/TfJs/075-224-feature-vector/3 |
+| `mobilenet-v2-050` | feature vector | `tfjs/model-mobilenet-v2-050/` | https://www.kaggle.com/models/google/mobilenet-v2/TfJs/050-224-feature-vector/3 |
+| `mobilenet-v1-100` | feature vector | `tfjs/model-mobilenet-v1-100/` | https://www.kaggle.com/models/google/mobilenet-v1/TfJs/100-224-feature-vector/2 |
+| `mobilenet-v1-075` | feature vector | `tfjs/model-mobilenet-v1-075/` | https://www.kaggle.com/models/google/mobilenet-v1/TfJs/075-224-feature-vector/2 |
+| `mobilenet-v1-050` | feature vector | `tfjs/model-mobilenet-v1-050/` | https://www.kaggle.com/models/google/mobilenet-v1/TfJs/050-224-feature-vector/2 |
+| `mobilenet-v1-025` | feature vector | `tfjs/model-mobilenet-v1-025/` | https://www.kaggle.com/models/google/mobilenet-v1/TfJs/025-224-feature-vector/2 |
+
+## SoundClassifier (`soundclassifier`)
+
+### TensorFlow.js
+
+| Variant | Part | Local folder | Source |
+| --- | --- | --- | --- |
+| `speechcommands18w` (default) | model, plus `metadata.json` | `tfjs/model/` | https://storage.googleapis.com/tfjs-models/tfjs/speech-commands/v0.5/browser_fft/18w |
+
+## Sentiment (`sentiment`)
+
+### TensorFlow.js
+
+| Variant | Part | Local folder | Source |
+| --- | --- | --- | --- |
+| `moviereviews` (default) | model, plus `metadata.json` | `tfjs/model/` | https://storage.googleapis.com/tfjs-models/tfjs/sentiment_cnn_v1 |
+
+## DepthEstimation (`depthestimation`)
+
+### TensorFlow.js
+
+| Variant | Part | Local folder | Source |
+| --- | --- | --- | --- |
+| `arportraitdepth` (default) | depth | `tfjs/depth/` | https://tfhub.dev/tensorflow/tfjs-model/ar_portrait_depth/1 |
+| `arportraitdepth` (default) | segmentation | `tfjs/segmentation/` | https://tfhub.dev/mediapipe/tfjs-model/selfie_segmentation/general/1 |

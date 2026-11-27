@@ -60,21 +60,21 @@ function variantSupports(model, variant, runtime) {
 /**
  * TFJS models to download for a set of variants. Variants that share a model
  * (BlazePose lite/full/heavy share one detector) produce a single entry.
- * @returns {Array<{key: string, path: string, url: string}>}
+ * @returns {Array<{key: string, path: string, url: string, extraFiles: string[]}>}
  */
 function getTfjsParts(model, variants) {
   const byPath = new Map();
   for (const variant of variants) {
     const parts = model.variants[variant].tfjs || {};
     for (const key of Object.keys(parts)) {
-      const { path, url } = parts[key];
+      const { path, url, extraFiles = [] } = parts[key];
       const existing = byPath.get(path);
       if (existing && existing.url !== url) {
         throw new Error(
           `Registry error: ${model.name} maps '${path}' to two different URLs.`
         );
       }
-      byPath.set(path, { key, path, url });
+      byPath.set(path, { key, path, url, extraFiles });
     }
   }
   return [...byPath.values()];
