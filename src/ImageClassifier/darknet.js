@@ -42,8 +42,10 @@ function preProcess(img, size) {
 }
 
 export class Darknet {
-  constructor(version) {
+  constructor(version, modelUrl) {
     this.version = version;
+    // Set when the model files are loaded from a local `modelPath` folder.
+    this.modelUrl = modelUrl;
     switch (this.version) {
       case "reference":
         this.imgSize = DEFAULTS.IMAGE_SIZE_DARKNET;
@@ -59,10 +61,14 @@ export class Darknet {
   async load() {
     switch (this.version) {
       case "reference":
-        this.model = await tf.loadLayersModel(DEFAULTS.DARKNET_URL);
+        this.model = await tf.loadLayersModel(
+          this.modelUrl || DEFAULTS.DARKNET_URL
+        );
         break;
       case "tiny":
-        this.model = await tf.loadLayersModel(DEFAULTS.DARKNET_TINY_URL);
+        this.model = await tf.loadLayersModel(
+          this.modelUrl || DEFAULTS.DARKNET_TINY_URL
+        );
         break;
       default:
         break;
@@ -87,14 +93,14 @@ export class Darknet {
 }
 
 export async function load(modelConfig) {
-  const { version } = modelConfig;
+  const { version, modelUrl } = modelConfig;
   if (version !== "reference" && version !== "tiny") {
     throw new Error(
       "Please select a version: darknet-reference or darknet-tiny"
     );
   }
 
-  const darknet = new Darknet(version);
+  const darknet = new Darknet(version, modelUrl);
   await darknet.load();
   return darknet;
 }

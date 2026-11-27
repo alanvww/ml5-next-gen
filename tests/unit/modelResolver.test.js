@@ -351,3 +351,125 @@ describe("resolveModelUrls", () => {
     expect(local.detectorModelUrl).toBe(`${ROOT}/tfjs/detector/model.json`);
   });
 });
+
+describe("resolveModelUrls for the other TensorFlow.js models", () => {
+  test("BodyPix options map to their own folder, the default to the short name", async () => {
+    const root = "./ml5-models/bodysegmentation";
+    mockServer({
+      [`${root}/manifest.json`]: manifest({
+        tfjs: {
+          variants: ["bodypix", "bodypix-mobilenet075-stride8-quant1"],
+        },
+      }),
+    });
+    const defaultConfig = {};
+    await resolveModelUrls({
+      modelName: "bodysegmentation",
+      variant: "bodypix-resnet50-stride16-quant2",
+      modelConfig: defaultConfig,
+      userOptions: { modelPath: root },
+    });
+    expect(defaultConfig.modelUrl).toBe(
+      `${root}/tfjs/model-bodypix/model.json`
+    );
+
+    const mobileNetConfig = {};
+    await resolveModelUrls({
+      modelName: "bodysegmentation",
+      variant: "bodypix-mobilenet075-stride8-quant1",
+      modelConfig: mobileNetConfig,
+      userOptions: { modelPath: root },
+    });
+    expect(mobileNetConfig.modelUrl).toBe(
+      `${root}/tfjs/model-bodypix-mobilenet075-stride8-quant1/model.json`
+    );
+  });
+
+  test("SelfieSegmentation can use its MediaPipe files", async () => {
+    const root = "./ml5-models/bodysegmentation";
+    mockServer({
+      [`${root}/manifest.json`]: manifest({
+        mediapipe: { variants: ["selfie"] },
+      }),
+    });
+    const modelConfig = { runtime: "tfjs", modelType: "general" };
+    await resolveModelUrls({
+      modelName: "bodysegmentation",
+      variant: "selfie",
+      modelConfig,
+      userOptions: { modelPath: root },
+    });
+    expect(modelConfig.runtime).toBe("mediapipe");
+    expect(modelConfig.solutionPath).toBe(`${root}/mediapipe`);
+  });
+
+  test("ARPortraitDepth gets both of its models", async () => {
+    const root = "./ml5-models/depthestimation";
+    mockServer({
+      [`${root}/manifest.json`]: manifest({
+        tfjs: { variants: ["arportraitdepth"] },
+      }),
+    });
+    const modelConfig = {};
+    await resolveModelUrls({
+      modelName: "depthestimation",
+      variant: "arportraitdepth",
+      modelConfig,
+      userOptions: { modelPath: root },
+    });
+    expect(modelConfig).toEqual({
+      depthModelUrl: `${root}/tfjs/depth/model.json`,
+      segmentationModelUrl: `${root}/tfjs/segmentation/model.json`,
+    });
+  });
+
+  test("MobileNet names from the sketch options resolve through aliases", async () => {
+    const root = "./ml5-models/imageclassifier";
+    mockServer({
+      [`${root}/manifest.json`]: manifest({
+        tfjs: { variants: ["mobilenet", "darknet-tiny"] },
+      }),
+    });
+    const modelConfig = { version: 2, alpha: 1 };
+    await resolveModelUrls({
+      modelName: "imageclassifier",
+      variant: "mobilenet-v2-100",
+      modelConfig,
+      userOptions: { modelPath: root },
+    });
+    expect(modelConfig.modelUrl).toBe(`${root}/tfjs/model/model.json`);
+
+    await expect(
+      resolveModelUrls({
+        modelName: "imageclassifier",
+        variant: "mobilenet-v1-025",
+        modelConfig: {},
+        userOptions: { modelPath: root },
+      })
+    ).rejects.toThrow(
+      "npx ml5 cache prefetch imageclassifier --variant mobilenet-v1-025"
+    );
+  });
+
+  test("the feature extractor and the single-model functions resolve", async () => {
+    const cases = [
+      ["featureextractor", "mobilenet-v2-100", "featureVectorURL", "mobilenet"],
+      ["soundclassifier", "speechcommands18w", "modelUrl", "speechcommands18w"],
+      ["sentiment", "moviereviews", "modelUrl", "moviereviews"],
+    ];
+    for (const [modelName, variant, key, staged] of cases) {
+      const root = `./ml5-models/${modelName}`;
+      mockServer({
+        [`${root}/manifest.json`]: manifest({ tfjs: { variants: [staged] } }),
+      });
+      const modelConfig = {};
+      await resolveModelUrls({
+        modelName,
+        variant,
+        modelConfig,
+        userOptions: { modelPath: root },
+      });
+      expect(modelConfig[key]).toBe(`${root}/tfjs/model/model.json`);
+    }
+  });
+});

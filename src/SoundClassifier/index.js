@@ -11,6 +11,8 @@ import * as tf from "@tensorflow/tfjs";
 import handleArguments from "../utils/handleArguments";
 import * as speechCommands from "./speechcommands";
 import callCallback from "../utils/callcallback";
+import { toAbsoluteUrl } from "../utils/modelRegistry";
+import { resolveModelUrls } from "../utils/modelResolver";
 
 const MODEL_OPTIONS = ["speechcommands18w"];
 // exporting the sound classifier instance so that the stop/start flags regarding classification state are accessible to speechcommands.js to use
@@ -56,7 +58,19 @@ class SoundClassifier {
 
   async loadModel(options) {
     await tf.ready();
-    this.model = await this.modelToUse.load(options, this.modelUrl);
+    let modelUrl = this.modelUrl;
+    if (!modelUrl) {
+      // Point at local files when the `modelPath` option is set.
+      const modelConfig = {};
+      await resolveModelUrls({
+        modelName: "soundclassifier",
+        variant: "speechcommands18w",
+        modelConfig,
+        userOptions: options,
+      });
+      if (modelConfig.modelUrl) modelUrl = toAbsoluteUrl(modelConfig.modelUrl);
+    }
+    this.model = await this.modelToUse.load(options, modelUrl);
     return this;
   }
 

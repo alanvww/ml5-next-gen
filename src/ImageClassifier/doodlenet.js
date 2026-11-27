@@ -41,12 +41,16 @@ function preProcess(img, size) {
 }
 
 export class Doodlenet {
-  constructor() {
+  constructor(modelUrl) {
     this.imgSize = DEFAULTS.IMAGE_SIZE_DOODLENET;
+    // Set when the model files are loaded from a local `modelPath` folder.
+    this.modelUrl = modelUrl;
   }
 
   async load() {
-    this.model = await tf.loadLayersModel(DEFAULTS.DOODLENET_URL);
+    this.model = await tf.loadLayersModel(
+      this.modelUrl || DEFAULTS.DOODLENET_URL
+    );
 
     // Warmup the model.
     const result = tf.tidy(() =>
@@ -66,8 +70,8 @@ export class Doodlenet {
   }
 }
 
-export async function load() {
-  const doodlenet = new Doodlenet();
+export async function load(modelConfig = {}) {
+  const doodlenet = new Doodlenet(modelConfig.modelUrl);
   await doodlenet.load();
   return doodlenet;
 }

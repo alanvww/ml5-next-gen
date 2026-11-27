@@ -70,6 +70,17 @@ export function getMediaPipeFiles(modelName, variant) {
   return [...info.mediapipe.shared, ...variantInfo.mediapipe];
 }
 
+/**
+ * Turns a path that is relative to index.html into a full URL. Loaders that
+ * work out sibling file URLs themselves (metadata.json next to model.json)
+ * need this.
+ */
+export function toAbsoluteUrl(url) {
+  return typeof document !== "undefined"
+    ? new URL(url, document.baseURI).href
+    : url;
+}
+
 export function joinUrl(base, path) {
   const normalizedBase = String(base).replace(/\/+$/, "");
   const normalizedPath = String(path).replace(/^\/+/, "");

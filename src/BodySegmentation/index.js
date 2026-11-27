@@ -17,6 +17,25 @@ import { mediaReady } from "../utils/imageUtilities";
 import handleOptions from "../utils/handleOptions";
 import { handleModelName } from "../utils/handleOptions";
 import { resizeImageAsTensor } from "../utils/imageUtilities";
+import { resolveModelUrls } from "../utils/modelResolver";
+
+/**
+ * Maps the model options to the variant names used for local model folders
+ * in `src/utils/modelRegistry.json`.
+ */
+const SELFIE_LOCAL_VARIANTS = {
+  general: "selfie",
+  landscape: "selfie-landscape",
+};
+const BODYPIX_MULTIPLIER_NAMES = { 1: "100", 0.75: "075", 0.5: "050" };
+
+function getBodyPixLocalVariant(config) {
+  const architecture =
+    config.architecture === "MobileNetV1"
+      ? `mobilenet${BODYPIX_MULTIPLIER_NAMES[config.multiplier]}`
+      : "resnet50";
+  return `bodypix-${architecture}-stride${config.outputStride}-quant${config.quantBytes}`;
+}
 
 class BodySegmentation {
   /**
@@ -188,6 +207,17 @@ class BodySegmentation {
     }
 
     await tf.ready();
+    // Point modelUrl (or solutionPath) at local files when the `modelPath`
+    // option is set.
+    await resolveModelUrls({
+      modelName: "bodysegmentation",
+      variant:
+        this.modelName === "BodyPix"
+          ? getBodyPixLocalVariant(modelConfig)
+          : SELFIE_LOCAL_VARIANTS[modelConfig.modelType],
+      modelConfig,
+      userOptions: this.config,
+    });
     this.model = await tfBodySegmentation.createSegmenter(
       pipeline,
       modelConfig

@@ -9,6 +9,7 @@ import handleOptions from "../utils/handleOptions";
 import { mediaReady } from "../utils/imageUtilities";
 import callCallback from "../utils/callcallback";
 import handleArguments, { getImageElement } from "../utils/handleArguments";
+import { resolveModelUrls } from "../utils/modelResolver";
 
 const IMAGE_SIZE = 224;
 const IMAGE_RESIZE_DIMENSIONS = [IMAGE_SIZE, IMAGE_SIZE];
@@ -26,6 +27,10 @@ const MOBILENET_FEATURE_VECTOR_URL = {
     1.0: "https://www.kaggle.com/models/google/mobilenet-v2/TfJs/100-224-feature-vector/3",
   },
 };
+
+// Used to build the variant names for local model folders in
+// `src/utils/modelRegistry.json`, such as "mobilenet-v1-025".
+const MOBILENET_ALPHA_NAMES = { 1: "100", 0.75: "075", 0.5: "050", 0.25: "025" };
 
 const DEFAULTS = {
   version: 2,
@@ -94,6 +99,7 @@ class Mobilenet {
 
     validateVersionAlphaCombination(this.config.version, this.config.alpha);
 
+    this.userOptions = options;
     this.MLP = null;
     this.featureVector = null;
     this.featureVectorURL =
@@ -115,13 +121,27 @@ class Mobilenet {
   async loadModel() {
     await tf.ready();
 
+    // Point featureVectorURL at local files when the `modelPath` option is set.
+    const modelConfig = { featureVectorURL: this.featureVectorURL };
+    await resolveModelUrls({
+      modelName: "featureextractor",
+      variant: `mobilenet-v${this.config.version}-${
+        MOBILENET_ALPHA_NAMES[this.config.alpha]
+      }`,
+      modelConfig,
+      userOptions: this.userOptions,
+    });
+    // Local files are plain model.json files, not a TF Hub or Kaggle page.
+    const fromTFHub = modelConfig.featureVectorURL === this.featureVectorURL;
+    this.featureVectorURL = modelConfig.featureVectorURL;
+
     console.log(
       "Loading MobileNet Feature Vector model from URL:",
       this.featureVectorURL
     );
 
     this.featureVector = await tf.loadGraphModel(this.featureVectorURL, {
-      fromTFHub: true,
+      fromTFHub,
     });
 
     this.normalizationOffset = tf.scalar(127.5);

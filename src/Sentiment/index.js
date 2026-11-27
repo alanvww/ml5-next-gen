@@ -3,6 +3,8 @@ import callCallback from "../utils/callcallback";
 import modelLoader from "../utils/modelLoader";
 import handleArguments from "../utils/handleArguments";
 import { handleModelName } from "../utils/handleOptions";
+import { toAbsoluteUrl } from "../utils/modelRegistry";
+import { resolveModelUrls } from "../utils/modelResolver";
 /**
  * Initializes the Sentiment demo.
  */
@@ -48,9 +50,11 @@ class Sentiment {
   /**
    * Create Sentiment model. Currently the supported model name is 'moviereviews'. ml5 may support different models in the future.
    * @param {String} modelName - A string to the path of the JSON model.
+   * @param {Object} [options] - Optional. `modelPath` is a folder of local model files made by
+   *    `ml5 cache prefetch`, for example './ml5-models/sentiment'. See docs/offline-mode.md.
    * @param {function} callback - Optional. A callback function that is called once the model has loaded. If no callback is provided, it will return a promise that will be resolved once the model has loaded.
    */
-  constructor(modelName, callback) {
+  constructor(modelName, options, callback) {
     /**
      * Promise that resolves when the model has loaded.
      * @type {Promise<Sentiment>}
@@ -62,6 +66,7 @@ class Sentiment {
       "MovieReviews",
       "sentiment"
     );
+    this.options = options || {};
     this.ready = callCallback(this.loadModel(), callback);
   }
 
@@ -76,7 +81,16 @@ class Sentiment {
         ? "https://storage.googleapis.com/tfjs-models/tfjs/sentiment_cnn_v1/"
         : this.modelName;
 
-    const loader = modelLoader(modelUrl, "model");
+    // Point at local files when the `modelPath` option is set.
+    const modelConfig = { modelUrl };
+    await resolveModelUrls({
+      modelName: "sentiment",
+      variant: "moviereviews",
+      modelConfig,
+      userOptions: this.options,
+    });
+
+    const loader = modelLoader(toAbsoluteUrl(modelConfig.modelUrl), "model");
 
     // load in parallel
     const [model, sentimentMetadata] = await Promise.all([
@@ -144,8 +158,8 @@ class Sentiment {
 }
 
 const sentiment = (...inputs) => {
-  const { string, callback } = handleArguments(...inputs);
-  const instance = new Sentiment(string, callback);
+  const { string, options, callback } = handleArguments(...inputs);
+  const instance = new Sentiment(string, options, callback);
   return instance;
 };
 

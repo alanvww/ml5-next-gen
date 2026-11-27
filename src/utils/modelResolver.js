@@ -336,7 +336,7 @@ async function resolveExplicitModelPath({
  * Applies the user's `modelPath` option to a model config, in place.
  *
  * @param {Object} args
- * @param {string} args.modelName - Registry key: "handpose", "facemesh", "bodypose" or "objectdetection".
+ * @param {string} args.modelName - Registry key in modelRegistry.json, such as "handpose".
  * @param {string} args.variant - Registry variant the sketch's options select.
  * @param {Object} args.modelConfig - Config that will be passed to the detector.
  * @param {Object} [args.userOptions] - The options object the user passed to ml5.

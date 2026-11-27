@@ -19,10 +19,14 @@ import { imgToTensor, mediaReady } from "../utils/imageUtilities";
 import handleOptions from "../utils/handleOptions";
 import { handleModelName } from "../utils/handleOptions";
 import { ImageClassifierTransformer } from "./transformer";
+import { resolveModelUrls } from "../utils/modelResolver";
 
 const IMAGE_SIZE = 224;
 const MODEL_OPTIONS = ["mobilenet", "darknet", "darknet-tiny", "doodlenet"];
 const TRANSFORMER_MODEL_NAMES = ["ViTBase", "SwinFood101"];
+// Used to build the variant names for local model folders in
+// `src/utils/modelRegistry.json`, such as "mobilenet-v1-025".
+const MOBILENET_ALPHA_NAMES = { 1: "100", 0.75: "075", 0.5: "050", 0.25: "025" };
 
 /**
  * Check if a string is a valid http url
@@ -50,6 +54,7 @@ class ImageClassifier {
   constructor(modelNameOrUrl, options, callback) {
     this.model = null;
     this.mapStringToIndex = [];
+    this.options = options || {};
 
     // flags for classifyStart() and classifyStop()
     this.isClassifying = false; // True when classification loop is running
@@ -128,11 +133,27 @@ class ImageClassifier {
   async loadModel(modelUrl) {
     await tf.ready();
     if (modelUrl) this.model = await this.loadModelFrom(modelUrl);
-    else
-      this.model = await this.modelToUse.load({
+    else {
+      const modelConfig = {
         version: this.version,
         alpha: this.alpha,
+      };
+      // Point modelUrl at local files when the `modelPath` option is set.
+      await resolveModelUrls({
+        modelName: "imageclassifier",
+        variant:
+          this.modelName === "mobilenet"
+            ? `mobilenet-v${this.version}-${MOBILENET_ALPHA_NAMES[this.alpha]}`
+            : this.modelName,
+        modelConfig,
+        userOptions: this.options,
       });
+      // With a custom URL the MobileNet package expects pixel values from -1
+      // to 1, but these models were trained on 0 to 1.
+      if (modelConfig.modelUrl && this.modelName === "mobilenet")
+        modelConfig.inputRange = [0, 1];
+      this.model = await this.modelToUse.load(modelConfig);
+    }
 
     return this;
   }

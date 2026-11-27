@@ -11,6 +11,7 @@ import handleArguments from "../utils/handleArguments";
 import { mediaReady } from "../utils/imageUtilities";
 import handleOptions from "../utils/handleOptions";
 import { resizeImageAsTensor } from "../utils/imageUtilities";
+import { resolveModelUrls } from "../utils/modelResolver";
 import {  
   createImageDataFromDepthValues,
   generateP5Image,
@@ -146,6 +147,16 @@ class TensorflowDepthEstimation {
     }
 
     await tf.ready();
+    // Point depthModelUrl and segmentationModelUrl at local files when the
+    // `modelPath` option is set.
+    await resolveModelUrls({
+      modelName: "depthestimation",
+      variant: "arportraitdepth",
+      modelConfig,
+      userOptions: this.config,
+    });
+    // The masking segmenter below loads the same segmentation model.
+    this.segmentationModelUrl = modelConfig.segmentationModelUrl;
     // Notify which model is being loaded
     console.log(
       `ml5.depthEstimation: loading "${this.modelName}" Tensorflow model.`
@@ -177,6 +188,7 @@ class TensorflowDepthEstimation {
       );
       this.segmenter = await bodySegmentation.createSegmenter(modelType, {
         runtime: "tfjs",
+        modelUrl: this.segmentationModelUrl,
       });
       // Successfully loaded the segmenter
     } catch (error) {
