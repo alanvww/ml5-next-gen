@@ -55,10 +55,10 @@ npx ml5 cache prefetch handpose
 ```
 
 ```js
-let handPose = ml5.handPose({ modelPath: "./ml5-models/handpose" });
+let handPose = await ml5.handPose({ modelPath: "./ml5-models/handpose" });
 ```
 
-See [docs/offline-mode.md](docs/offline-mode.md) for the full guide.
+p5.js and ml5.js have to be local files too. See [docs/offline-mode.md](docs/offline-mode.md) for the full guide, or [docs/offline-from-web-editor.md](docs/offline-from-web-editor.md) to move a p5.js Web Editor sketch offline step by step.
 
 
 ## Resources

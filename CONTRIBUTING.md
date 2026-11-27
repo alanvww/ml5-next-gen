@@ -325,12 +325,16 @@ This section documents the utility functions found in the `src/utils` folder.
 
 ### Updating offline model files
 
-Offline model support uses `src/utils/modelRegistry.js` as the source of truth for TFJS model URLs and MediaPipe file lists. When bumping model packages or changing upstream URLs:
+Offline model support (`modelPath` and the `ml5 cache` CLI) reads everything it knows about model files from one place: `src/utils/modelRegistry.json`. Both the browser bundle and the Node CLI import that file, so there is nothing to keep in sync by hand.
 
-1. Update `src/utils/modelRegistry.js`.
-2. Run `ml5 cache prefetch <model> --force` for each affected model.
-3. Run `ml5 cache verify <model>` to confirm the generated `manifest.json` checksums.
-4. Test the corresponding example with DevTools Network open and confirm model files are loaded from `localhost`.
+When bumping a `@mediapipe/*` or `@tensorflow-models/*` package, changing an upstream URL, or adding a variant:
+
+1. Update `src/utils/modelRegistry.json`. A unit test fails if a pinned MediaPipe version or file list no longer matches the installed package.
+2. Run `yarn update-model-urls` to regenerate `docs/model-urls.md`.
+3. Run `node bin/ml5.js cache prefetch <model> --variant all --runtime both --force`, then `node bin/ml5.js cache verify`.
+4. Test the corresponding `*-offline-local-model-cli` example with Wi-Fi off, or with DevTools → Network open, and confirm every model file is loaded from `localhost`.
+
+To give another ml5 model offline support, add it to the registry and call `resolveModelUrls()` (`src/utils/modelResolver.js`) in its `loadModel()`, passing the variant the user's options select. `src/HandPose/index.js` is the smallest example. See `cli/README.md` for how the CLI is organised.
 
 ### [handleOptions](src\utils\handleOptions.js)
 

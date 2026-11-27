@@ -18,6 +18,8 @@ To download a TFJS model manually:
 
 The `?tfjs-format=file` part is important for TFHub links. It asks TFHub for browser-friendly files instead of a webpage.
 
+The tables below cover the default model of each kind. If your sketch uses another variant (`modelType: "lite"`, `refineLandmarks: true`, single-pose MoveNet, BlazePose `lite` or `heavy`), the folder name is different, for example `tfjs/landmark-lite/`. [`../model-urls.md`](../model-urls.md) lists the source URL and local folder for every variant.
+
 ### HandPose TFJS
 
 | Piece | Download `model.json` from | Put it here |
