@@ -6,10 +6,13 @@ import bodyPose from "./BodyPose";
 import imageClassifier from "./ImageClassifier";
 import soundClassifier from "./SoundClassifier";
 import objectDetection from "./ObjectDetection";
+import featureExtractor from "./FeatureExtractor";
 import setBackend from "./utils/setBackend";
+import configureBackend from "./utils/configureBackend";
 import bodySegmentation from "./BodySegmentation";
 import depthEstimation from "./DepthEstimation";
 import communityStatement from "./utils/communityStatement";
+import speechToText from "./SpeechToText";
 import * as tf from "@tensorflow/tfjs";
 import * as tfvis from "@tensorflow/tfjs-vis";
 import p5Utils from "./utils/p5Utils";
@@ -20,12 +23,14 @@ const withPreload = {
   bodySegmentation,
   depthEstimation,
   faceMesh,
+  featureExtractor,
   handPose,
   imageClassifier,
   neuralNetwork,
+  objectDetection,
   sentiment,
   soundClassifier,
-  objectDetection
+  speechToText,
 };
 
 const withoutAsync = {
@@ -40,7 +45,14 @@ const ml5 = Object.assign({ p5Utils }, withPreload, {
   setP5: p5Utils.setP5.bind(p5Utils),
 });
 
-p5Utils.setupP5Integration(ml5, Object.keys(withPreload), Object.keys(withoutAsync));
+p5Utils.setupP5Integration(
+  ml5,
+  Object.keys(withPreload),
+  Object.keys(withoutAsync)
+);
+
+// Apply ml5's default TensorFlow.js backend configuration (see issue #302).
+configureBackend();
 
 communityStatement();
 

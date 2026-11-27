@@ -9,22 +9,20 @@
 let depthEstimator;
 let webcam;
 let depthMap;
-
 let backdrop;
 
 // Video dimensions
 let videoWidth = 640;
 let videoHeight = 480;
 
-function preload() {
-  // Load and start the depth estimation model
-  depthEstimator = ml5.depthEstimation();
+async function setup() {
+  // Load the model
+  // ARPortraitDepth is the only depth estimation model that has a mask output
+  depthEstimator = await ml5.depthEstimation('ARPortraitDepth');
 
-  // Load the backdrop image. "Bright Center Star Cluster" by NASA
-  backdrop = loadImage('starcluster.jpg');
-}
+  // Load a backdrop image. "Bright Center Star Cluster" by NASA
+  backdrop = await loadImage('starcluster.jpg'); 
 
-function setup() {
   // Create a canvas the size of the webcam video
   createCanvas(videoWidth, videoHeight);
 
