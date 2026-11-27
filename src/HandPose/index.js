@@ -36,8 +36,9 @@ import { resolveModelUrls } from "../utils/modelResolver";
  * @property {string} [modelType]          - The type of model to use.
  * @property {boolean} [flipHorizontal]    - Whether to mirror the landmark results.
  * @property {string} [runtime]            - The runtime of the model.
- * @property {string|boolean} [modelPath]  - A local model folder, a direct model folder, 'auto',
- *                                           or false to skip local model auto-detection.
+ * @property {string} [modelPath]           - Folder of local model files made by `ml5 cache prefetch`,
+ *                                           for example './ml5-models/handpose'. 'auto' uses that folder
+ *                                           only when it exists. See docs/offline-mode.md.
  * @property {string} [solutionPath]       - The file path or URL to mediaPipe solution. Only for
  *                                           `mediapipe` runtime.
  * @property {string} [detectorModelUrl]   - The file path or URL to the hand detector model. Only
@@ -157,6 +158,7 @@ class HandPose {
     await tf.ready();
     await resolveModelUrls({
       modelName: "handpose",
+      variant: modelConfig.modelType,
       modelConfig,
       userOptions: this.userOptions,
     });

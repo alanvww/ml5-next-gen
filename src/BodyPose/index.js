@@ -45,8 +45,9 @@ import { resolveModelUrls } from "../utils/modelResolver";
  * @property {string} [trackerType]           - The type of tracker to use.
  * @property {object} [trackerConfig]         - Advanced tracker configurations.
  * @property {string} [modelUrl]              - The file path or URL to the MoveNet model.
- * @property {string|boolean} [modelPath]     - A local model folder, a direct model folder, 'auto',
- *                                             or false to skip local model auto-detection.
+ * @property {string} [modelPath]              - Folder of local model files made by `ml5 cache prefetch`,
+ *                                             for example './ml5-models/bodypose'. 'auto' uses that folder
+ *                                             only when it exists. See docs/offline-mode.md.
  */
 
 /**
@@ -67,9 +68,25 @@ import { resolveModelUrls } from "../utils/modelResolver";
  *                                              model. Only for `tfjs` runtime.
  * @property {string} [landmarkModelUrl]      - The file path or URL to the BlazePose landmark
  *                                              model. Only for `tfjs` runtime.
- * @property {string|boolean} [modelPath]     - A local model folder, a direct model folder, 'auto',
- *                                             or false to skip local model auto-detection.
+ * @property {string} [modelPath]              - Folder of local model files made by `ml5 cache prefetch`,
+ *                                             for example './ml5-models/bodypose'. 'auto' uses that folder
+ *                                             only when it exists. See docs/offline-mode.md.
  */
+
+/**
+ * Maps the `modelType` option to the variant names used for local model
+ * folders in `src/utils/modelRegistry.json`.
+ */
+const MOVENET_LOCAL_VARIANTS = {
+  MULTIPOSE_LIGHTNING: "movenet",
+  SINGLEPOSE_LIGHTNING: "movenet-singlepose-lightning",
+  SINGLEPOSE_THUNDER: "movenet-singlepose-thunder",
+};
+const BLAZEPOSE_LOCAL_VARIANTS = {
+  full: "blazepose",
+  lite: "blazepose-lite",
+  heavy: "blazepose-heavy",
+};
 
 /**
  * Schema for MoveNet model configuration, used by `handleOptions` to
@@ -239,12 +256,11 @@ class BodyPose {
         MoveNetConfigSchema,
         "bodyPose"
       );
-      await tf.ready();
       await resolveModelUrls({
         modelName: "bodypose",
+        variant: MOVENET_LOCAL_VARIANTS[modelConfig.modelType],
         modelConfig,
         userOptions: this.userOptions,
-        modelNameForBodyPose: this.modelName,
       });
       // Map the modelType string to the `movenet.modelType` enum
       switch (modelConfig.modelType) {
@@ -272,9 +288,9 @@ class BodyPose {
     if (this.modelName === "BlazePose") {
       await resolveModelUrls({
         modelName: "bodypose",
+        variant: BLAZEPOSE_LOCAL_VARIANTS[modelConfig.modelType],
         modelConfig,
         userOptions: this.userOptions,
-        modelNameForBodyPose: this.modelName,
       });
     }
     this.model = await poseDetection.createDetector(pipeline, modelConfig);

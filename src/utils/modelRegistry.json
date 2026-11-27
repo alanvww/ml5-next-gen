@@ -1,0 +1,205 @@
+{
+  "$comment": "Single source of truth for offline model files. Read by the browser bundle (src/utils/modelRegistry.js) and by the Node CLI (cli/registry.js). See CONTRIBUTING.md, 'Updating offline model files'.",
+  "models": {
+    "handpose": {
+      "label": "HandPose",
+      "dir": "handpose",
+      "defaultVariants": ["full"],
+      "variants": {
+        "full": {
+          "description": "Balanced default (modelType: \"full\")",
+          "tfjs": {
+            "detectorModelUrl": {
+              "path": "tfjs/detector",
+              "url": "https://tfhub.dev/mediapipe/tfjs-model/handpose_3d/detector/full/1"
+            },
+            "landmarkModelUrl": {
+              "path": "tfjs/landmark",
+              "url": "https://tfhub.dev/mediapipe/tfjs-model/handpose_3d/landmark/full/1"
+            }
+          },
+          "mediapipe": ["hand_landmark_full.tflite"]
+        },
+        "lite": {
+          "description": "Smaller and faster (modelType: \"lite\")",
+          "tfjs": {
+            "detectorModelUrl": {
+              "path": "tfjs/detector-lite",
+              "url": "https://tfhub.dev/mediapipe/tfjs-model/handpose_3d/detector/lite/1"
+            },
+            "landmarkModelUrl": {
+              "path": "tfjs/landmark-lite",
+              "url": "https://tfhub.dev/mediapipe/tfjs-model/handpose_3d/landmark/lite/1"
+            }
+          },
+          "mediapipe": ["hand_landmark_lite.tflite"]
+        }
+      },
+      "mediapipe": {
+        "package": "@mediapipe/hands",
+        "version": "0.4.1675469240",
+        "marker": "hands.binarypb",
+        "shared": [
+          "hands.binarypb",
+          "hands.js",
+          "hands_solution_packed_assets.data",
+          "hands_solution_packed_assets_loader.js",
+          "hands_solution_simd_wasm_bin.js",
+          "hands_solution_simd_wasm_bin.wasm",
+          "hands_solution_simd_wasm_bin.data",
+          "hands_solution_wasm_bin.js",
+          "hands_solution_wasm_bin.wasm"
+        ]
+      }
+    },
+    "facemesh": {
+      "label": "FaceMesh",
+      "dir": "facemesh",
+      "defaultVariants": ["default"],
+      "variants": {
+        "default": {
+          "description": "468 keypoints (refineLandmarks: false)",
+          "tfjs": {
+            "detectorModelUrl": {
+              "path": "tfjs/detector",
+              "url": "https://tfhub.dev/mediapipe/tfjs-model/face_detection/short/1"
+            },
+            "landmarkModelUrl": {
+              "path": "tfjs/landmark",
+              "url": "https://tfhub.dev/mediapipe/tfjs-model/face_landmarks_detection/face_mesh/1"
+            }
+          },
+          "mediapipe": []
+        },
+        "refined": {
+          "description": "478 keypoints with iris and lips detail (refineLandmarks: true)",
+          "tfjs": {
+            "detectorModelUrl": {
+              "path": "tfjs/detector",
+              "url": "https://tfhub.dev/mediapipe/tfjs-model/face_detection/short/1"
+            },
+            "landmarkModelUrl": {
+              "path": "tfjs/landmark-refined",
+              "url": "https://tfhub.dev/mediapipe/tfjs-model/face_landmarks_detection/attention_mesh/1"
+            }
+          },
+          "mediapipe": []
+        }
+      },
+      "mediapipe": {
+        "package": "@mediapipe/face_mesh",
+        "version": "0.4.1633559619",
+        "marker": "face_mesh.binarypb",
+        "shared": [
+          "face_mesh.binarypb",
+          "face_mesh.js",
+          "face_mesh_solution_packed_assets.data",
+          "face_mesh_solution_packed_assets_loader.js",
+          "face_mesh_solution_simd_wasm_bin.js",
+          "face_mesh_solution_simd_wasm_bin.wasm",
+          "face_mesh_solution_simd_wasm_bin.data",
+          "face_mesh_solution_wasm_bin.js",
+          "face_mesh_solution_wasm_bin.wasm"
+        ]
+      }
+    },
+    "bodypose": {
+      "label": "BodyPose",
+      "dir": "bodypose",
+      "defaultVariants": ["movenet", "blazepose"],
+      "aliases": {
+        "full": "blazepose",
+        "lite": "blazepose-lite",
+        "heavy": "blazepose-heavy",
+        "blazepose-full": "blazepose"
+      },
+      "variants": {
+        "movenet": {
+          "description": "MoveNet multi-pose lightning, the bodyPose default",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model",
+              "url": "https://tfhub.dev/google/tfjs-model/movenet/multipose/lightning/1"
+            }
+          }
+        },
+        "movenet-singlepose-lightning": {
+          "description": "MoveNet (modelType: \"SINGLEPOSE_LIGHTNING\")",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-singlepose-lightning",
+              "url": "https://tfhub.dev/google/tfjs-model/movenet/singlepose/lightning/4"
+            }
+          }
+        },
+        "movenet-singlepose-thunder": {
+          "description": "MoveNet (modelType: \"SINGLEPOSE_THUNDER\")",
+          "tfjs": {
+            "modelUrl": {
+              "path": "tfjs/model-singlepose-thunder",
+              "url": "https://tfhub.dev/google/tfjs-model/movenet/singlepose/thunder/4"
+            }
+          }
+        },
+        "blazepose": {
+          "description": "BlazePose (modelType: \"full\")",
+          "tfjs": {
+            "detectorModelUrl": {
+              "path": "tfjs/detector",
+              "url": "https://tfhub.dev/mediapipe/tfjs-model/blazepose_3d/detector/1"
+            },
+            "landmarkModelUrl": {
+              "path": "tfjs/landmark",
+              "url": "https://tfhub.dev/mediapipe/tfjs-model/blazepose_3d/landmark/full/2"
+            }
+          },
+          "mediapipe": ["pose_landmark_full.tflite"]
+        },
+        "blazepose-lite": {
+          "description": "BlazePose (modelType: \"lite\")",
+          "tfjs": {
+            "detectorModelUrl": {
+              "path": "tfjs/detector",
+              "url": "https://tfhub.dev/mediapipe/tfjs-model/blazepose_3d/detector/1"
+            },
+            "landmarkModelUrl": {
+              "path": "tfjs/landmark-lite",
+              "url": "https://tfhub.dev/mediapipe/tfjs-model/blazepose_3d/landmark/lite/2"
+            }
+          },
+          "mediapipe": ["pose_landmark_lite.tflite"]
+        },
+        "blazepose-heavy": {
+          "description": "BlazePose (modelType: \"heavy\")",
+          "tfjs": {
+            "detectorModelUrl": {
+              "path": "tfjs/detector",
+              "url": "https://tfhub.dev/mediapipe/tfjs-model/blazepose_3d/detector/1"
+            },
+            "landmarkModelUrl": {
+              "path": "tfjs/landmark-heavy",
+              "url": "https://tfhub.dev/mediapipe/tfjs-model/blazepose_3d/landmark/heavy/2"
+            }
+          },
+          "mediapipe": ["pose_landmark_heavy.tflite"]
+        }
+      },
+      "mediapipe": {
+        "package": "@mediapipe/pose",
+        "version": "0.5.1675469404",
+        "marker": "pose_web.binarypb",
+        "shared": [
+          "pose_web.binarypb",
+          "pose.js",
+          "pose_solution_packed_assets.data",
+          "pose_solution_packed_assets_loader.js",
+          "pose_solution_simd_wasm_bin.js",
+          "pose_solution_simd_wasm_bin.wasm",
+          "pose_solution_simd_wasm_bin.data",
+          "pose_solution_wasm_bin.js",
+          "pose_solution_wasm_bin.wasm"
+        ]
+      }
+    }
+  }
+}

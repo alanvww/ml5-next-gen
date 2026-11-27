@@ -35,8 +35,9 @@ import { resolveModelUrls } from "../utils/modelResolver";
  * @property {boolean} [refineLandmarks]   - Whether to refine the landmarks.
  * @property {boolean} [flipHorizontal]    - Whether to mirror the results.
  * @property {string} [runtime]            - The runtime to use.
- * @property {string|boolean} [modelPath]  - A local model folder, a direct model folder, 'auto',
- *                                           or false to skip local model auto-detection.
+ * @property {string} [modelPath]           - Folder of local model files made by `ml5 cache prefetch`,
+ *                                           for example './ml5-models/facemesh'. 'auto' uses that folder
+ *                                           only when it exists. See docs/offline-mode.md.
  * @property {string} [solutionPath]       - The file path or URL to the MediaPipe solution. Only
  *                                           for `mediapipe` runtime.
  * @property {string} [detectorModelUrl]   - The file path or URL to the detector model. Only for
@@ -151,6 +152,7 @@ class FaceMesh {
     await tf.ready();
     await resolveModelUrls({
       modelName: "facemesh",
+      variant: modelConfig.refineLandmarks ? "refined" : "default",
       modelConfig,
       userOptions: this.userOptions,
     });

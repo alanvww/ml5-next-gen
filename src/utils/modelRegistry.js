@@ -1,142 +1,73 @@
-export const MODEL_DIRS = {
-  handpose: "handpose",
-  facemesh: "facemesh",
-  bodypose: "bodypose",
-};
+/**
+ * Browser-side accessors for the offline model registry.
+ *
+ * The data lives in `modelRegistry.json` so the Node CLI (`cli/registry.js`)
+ * can read exactly the same file without a build step. Do not add model URLs
+ * or file lists here; edit the JSON instead.
+ */
 
-export const TFJS_MODEL_PATHS = {
-  handpose: {
-    detectorModelUrl: "tfjs/detector/model.json",
-    landmarkModelUrl: "tfjs/landmark/model.json",
-  },
-  facemesh: {
-    detectorModelUrl: "tfjs/detector/model.json",
-    landmarkModelUrl: "tfjs/landmark/model.json",
-  },
-  bodypose: {
-    modelUrl: "tfjs/model/model.json",
-  },
-  bodyposeBlazepose: {
-    detectorModelUrl: "tfjs/detector/model.json",
-    landmarkModelUrl: "tfjs/landmark/model.json",
-  },
-};
+import registry from "./modelRegistry.json";
 
-export const TFJS_MODEL_URLS = {
-  handpose: {
-    detectorModelUrl: "https://tfhub.dev/mediapipe/tfjs-model/handpose_3d/detector/full/1",
-    landmarkModelUrl: "https://tfhub.dev/mediapipe/tfjs-model/handpose_3d/landmark/full/1",
-  },
-  facemesh: {
-    detectorModelUrl: "https://tfhub.dev/mediapipe/tfjs-model/face_detection/short/1",
-    landmarkModelUrl: "https://tfhub.dev/mediapipe/tfjs-model/face_landmarks_detection/face_mesh/1",
-  },
-  bodypose: {
-    modelUrl: "https://tfhub.dev/google/tfjs-model/movenet/multipose/lightning/1",
-  },
-  bodyposeBlazepose: {
-    detectorModelUrl: "https://tfhub.dev/mediapipe/tfjs-model/blazepose_3d/detector/1",
-    landmarkModelUrl: "https://tfhub.dev/mediapipe/tfjs-model/blazepose_3d/landmark/full/2",
-  },
-};
+export const MODEL_MANIFEST_SCHEMA = "ml5-models-manifest-v2";
 
-export const MEDIAPIPE_MARKER_FILES = {
-  handpose: "hands.binarypb",
-  facemesh: "face_mesh.binarypb",
-  bodypose: "pose_web.binarypb",
-};
-
-export const MEDIAPIPE_PACKAGES = {
-  handpose: {
-    pkg: "@mediapipe/hands",
-    defaultVariant: "full",
-    shared: [
-      "hands.binarypb",
-      "hands.js",
-      "hands_solution_packed_assets.data",
-      "hands_solution_packed_assets_loader.js",
-      "hands_solution_simd_wasm_bin.js",
-      "hands_solution_simd_wasm_bin.wasm",
-      "hands_solution_simd_wasm_bin.data",
-      "hands_solution_wasm_bin.js",
-      "hands_solution_wasm_bin.wasm",
-    ],
-    variants: {
-      lite: ["hand_landmark_lite.tflite"],
-      full: ["hand_landmark_full.tflite"],
-    },
-  },
-  facemesh: {
-    pkg: "@mediapipe/face_mesh",
-    defaultVariant: "default",
-    shared: [
-      "face_mesh.binarypb",
-      "face_mesh.js",
-      "face_mesh_solution_packed_assets.data",
-      "face_mesh_solution_packed_assets_loader.js",
-      "face_mesh_solution_simd_wasm_bin.js",
-      "face_mesh_solution_simd_wasm_bin.wasm",
-      "face_mesh_solution_simd_wasm_bin.data",
-      "face_mesh_solution_wasm_bin.js",
-      "face_mesh_solution_wasm_bin.wasm",
-    ],
-    variants: {
-      default: [],
-    },
-  },
-  bodypose: {
-    pkg: "@mediapipe/pose",
-    defaultVariant: "full",
-    shared: [
-      "pose_web.binarypb",
-      "pose.js",
-      "pose_solution_packed_assets.data",
-      "pose_solution_packed_assets_loader.js",
-      "pose_solution_simd_wasm_bin.js",
-      "pose_solution_simd_wasm_bin.wasm",
-      "pose_solution_simd_wasm_bin.data",
-      "pose_solution_wasm_bin.js",
-      "pose_solution_wasm_bin.wasm",
-    ],
-    variants: {
-      lite: ["pose_landmark_lite.tflite"],
-      full: ["pose_landmark_full.tflite"],
-      heavy: ["pose_landmark_heavy.tflite"],
-    },
-  },
-};
+/**
+ * @param {string} modelName - A registry key such as "handpose".
+ * @returns {Object|undefined} The registry entry, or undefined when the model
+ * has no offline support.
+ */
+export function getModelInfo(modelName) {
+  return registry.models[modelName];
+}
 
 export function getModelDirName(modelName) {
-  return MODEL_DIRS[modelName] || modelName;
+  const info = getModelInfo(modelName);
+  return (info && info.dir) || modelName;
 }
 
-export function getMediaPipePackageInfo(modelName) {
-  return MEDIAPIPE_PACKAGES[modelName];
+/**
+ * Resolves a user-facing variant name (or alias) to a registry variant key.
+ * @returns {string|undefined} The canonical variant key, or undefined.
+ */
+export function resolveVariantName(modelName, variant) {
+  const info = getModelInfo(modelName);
+  if (!info || !variant) return undefined;
+  if (info.variants[variant]) return variant;
+  const alias = info.aliases && info.aliases[variant];
+  return alias && info.variants[alias] ? alias : undefined;
 }
 
+export function getVariantInfo(modelName, variant) {
+  const info = getModelInfo(modelName);
+  const key = resolveVariantName(modelName, variant);
+  return key ? info.variants[key] : undefined;
+}
+
+/**
+ * Local TFJS `model.json` paths for one variant, keyed by the config option
+ * they belong to (`modelUrl`, `detectorModelUrl`, `landmarkModelUrl`).
+ * Paths are relative to the model root.
+ */
+export function getTfjsLocalPaths(modelName, variant) {
+  const variantInfo = getVariantInfo(modelName, variant);
+  if (!variantInfo || !variantInfo.tfjs) return undefined;
+  const paths = {};
+  Object.keys(variantInfo.tfjs).forEach((key) => {
+    paths[key] = `${variantInfo.tfjs[key].path}/model.json`;
+  });
+  return paths;
+}
+
+/**
+ * MediaPipe files one variant needs, relative to the `mediapipe/` folder.
+ * Returns undefined when the variant has no MediaPipe runtime (MoveNet).
+ */
 export function getMediaPipeFiles(modelName, variant) {
-  const info = getMediaPipePackageInfo(modelName);
-  if (!info) return [];
-  const resolvedVariant = variant === "all" ? "all" : variant || info.defaultVariant;
-  const variantFiles =
-    resolvedVariant === "all"
-      ? Object.keys(info.variants).flatMap((key) => info.variants[key])
-      : info.variants[resolvedVariant] || info.variants[info.defaultVariant] || [];
-  return [...info.shared, ...variantFiles];
-}
-
-export function getTfjsModelUrls(modelName, options = {}) {
-  if (modelName === "bodypose" && options.modelNameForBodyPose === "BlazePose") {
-    return TFJS_MODEL_URLS.bodyposeBlazepose;
+  const info = getModelInfo(modelName);
+  const variantInfo = getVariantInfo(modelName, variant);
+  if (!info || !info.mediapipe || !variantInfo || !variantInfo.mediapipe) {
+    return undefined;
   }
-  return TFJS_MODEL_URLS[modelName];
-}
-
-export function getTfjsLocalPaths(modelName, options = {}) {
-  if (modelName === "bodypose" && options.modelNameForBodyPose === "BlazePose") {
-    return TFJS_MODEL_PATHS.bodyposeBlazepose;
-  }
-  return TFJS_MODEL_PATHS[modelName];
+  return [...info.mediapipe.shared, ...variantInfo.mediapipe];
 }
 
 export function joinUrl(base, path) {
